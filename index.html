@@ -271,11 +271,29 @@ function fbErr(e){var c=(e&&e.code)||'';
  'Cloud sign-in failed ('+(c||'unknown error')+'). Check your Firebase setup and connection.'}
 function loadP(x,uid){return x.f.getDoc(x.f.doc(x.db,'users',uid)).then(function(s){return s.exists()?s.data():null})}
 var cloud={
- google:function(){if(!FIREBASE_CONFIG)return Promise.reject('Google sign-in works on the hosted version with Firebase. On this preview, use device storage.');
-  return fbLoad().then(function(x){return x.a.signInWithPopup(x.auth,new x.a.GoogleAuthProvider()).then(function(c){LS.set('ct.cloud',1);return loadP(x,c.user.uid).then(function(p){return{type:'google',id:c.user.displayName||'friend',uid:c.user.uid,profile:p}})})}).catch(function(e){throw fbErr(e)})},
+ google:function(profile){if(!FIREBASE_CONFIG)return Promise.reject('Google sign-in works on the hosted version with Firebase. On this preview, use device storage.');
+  return fbLoad().then(function(x){
+   LS.set('ct.pendingProfile',profile||null);LS.set('ct.cloud',1);
+   return x.a.signInWithRedirect(x.auth,new x.a.GoogleAuthProvider());
+  }).catch(function(e){throw fbErr(e)})},
  save:function(u,p){return fbLoad().then(function(x){return x.f.setDoc(x.f.doc(x.db,'users',u.uid),p)}).catch(function(){throw'Saving to the cloud failed. Check your connection and Firestore rules.'})},
- restore:function(){return fbLoad().then(function(x){return new Promise(function(res){var off=x.a.onAuthStateChanged(x.auth,function(u){off();if(!u)return res(null);loadP(x,u.uid).then(function(p){res({type:'google',id:u.displayName||'friend',uid:u.uid,profile:p})}).catch(function(){res(null)})})})}).catch(function(){return null})},
- out:function(){LS.set('ct.cloud',null);if(!FIREBASE_CONFIG)return Promise.resolve();return fbLoad().then(function(x){return x.a.signOut(x.auth)}).catch(function(){})}
+ restore:function(){return fbLoad().then(function(x){
+  function finish(u){if(!u)return Promise.resolve(null);
+   return loadP(x,u.uid).then(function(p){
+    var pending=LS.get('ct.pendingProfile',null);
+    var user={type:'google',id:u.displayName||'friend',uid:u.uid,profile:p};
+    if(pending){return x.f.setDoc(x.f.doc(x.db,'users',u.uid),pending).then(function(){LS.set('ct.pendingProfile',null);user.profile=pending;return user})}
+    return user;
+   });
+  }
+  return x.a.getRedirectResult(x.auth).then(function(result){
+   if(result&&result.user)return finish(result.user);
+   return new Promise(function(resolve,reject){
+    var off=x.a.onAuthStateChanged(x.auth,function(u){off();finish(u).then(resolve,reject)},reject);
+   });
+  });
+ }).catch(function(e){LS.set('ct.pendingProfile',null);throw e})},
+ out:function(){LS.set('ct.cloud',null);LS.set('ct.pendingProfile',null);if(!FIREBASE_CONFIG)return Promise.resolve();return fbLoad().then(function(x){return x.a.signOut(x.auth)}).catch(function(){})}
 };
 if(FIREBASE_CONFIG)fbLoad().catch(function(){});
 
@@ -372,7 +390,7 @@ $('#sg').onclick=function(){var d=data(),e=$('#e2');e.textContent='';if(typeof d
 $('#sv').onclick=function(){var d=data(),e=$('#e3');e.textContent='';if(typeof d==='string'){e.textContent=d;return}
  (cur.type==='google'?cloud:local).save(cur,d).then(function(){cur.profile=d;home()}).catch(function(x){e.textContent=msg(x)})};
 
-local.restore().then(function(u){return u||(FIREBASE_CONFIG&&LS.get('ct.cloud',null)?cloud.restore():null)}).then(function(u){if(u){cur=u;if(u.profile)home();else{edit(false);show('v2')}}}).catch(function(){});
+(FIREBASE_CONFIG&&LS.get('ct.cloud',null)?cloud.restore():Promise.resolve(null)).then(function(u){return u||local.restore()}).then(function(u){if(u){cur=u;if(u.profile)home();else{edit(false);show('v2')}}}).catch(function(e){$('#er').textContent=fbErr(e);});
 })();
 </script>
 </body>
