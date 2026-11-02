@@ -81,6 +81,10 @@ input:focus,textarea:focus{border-color:var(--ink)}
 .cap svg{flex:1;min-width:0;max-width:240px;border:1.5px solid var(--ln);border-radius:10px}
 .cap button{border:1.5px solid var(--ln);background:var(--sf);color:var(--ink);border-radius:999px;padding:8px 14px;font:600 .9rem Figtree,sans-serif;cursor:pointer}
 .capin{margin:10px 0 14px}
+.mrow{display:flex;gap:8px;margin-bottom:8px}.mrow input{flex:1;min-width:0}
+.mrow .x{flex:none;width:46px;border:1.5px solid var(--ln);background:var(--sf);color:var(--ink);border-radius:12px;font-size:1.4rem;line-height:1;cursor:pointer}
+.addm{padding:9px 18px;font-size:.95rem}
+@media(min-width:1024px){.form{max-width:800px}.card{padding:36px;border-radius:30px}.card h3{font-size:1.4rem}input,textarea{padding:15px 18px;font-size:17px}textarea{min-height:110px}.num{font-size:3.8rem}.btn{padding:16px 32px}.lead{font-size:1.25rem}.seg button{padding:10px 18px}}
 </style>
 </head>
 <body>
@@ -175,7 +179,8 @@ input:focus,textarea:focus{border-color:var(--ink)}
    <div class="card">
     <h3><svg viewBox="0 0 40 40" aria-hidden="true"><rect x="3" y="14" width="34" height="14" rx="7" transform="rotate(-35 20 21)" fill="#FF4F6D"/><path d="M12 11l17 20" stroke="#fff" stroke-width="2"/></svg>Health details <span class="opt">(optional)</span></h3>
     <label class="f"><span class="lh">Any medical condition?</span><textarea id="mc" placeholder="Leave blank to skip"></textarea></label>
-    <label class="f" style="margin-bottom:0"><span class="lh">What medicine do you take?</span><input id="md" placeholder="Leave blank to skip"></label>
+    <div class="f" style="margin-bottom:14px"><span class="lh">What medicine do you take?</span><div id="mds"></div><button type="button" class="btn alt addm" id="addm">+ Add another medicine</button></div>
+    <label class="chk" style="margin-bottom:0"><input type="checkbox" id="hcon"><span>I agree that the health details I fill in here can be used inside this app, including its AI features, to personalise my tracking and suggestions. I can change or clear them later by editing my details.</span></label>
    </div>
 
    <div class="card" id="lcard">
@@ -309,7 +314,7 @@ $('#bk').onclick=function(){cur&&cur.profile?home():show('v1')};
 $('#lo').onclick=function(){Promise.all([local.out(),cloud.out()]).then(function(){cur=null;['uid','pw','nid','npw','npw2'].forEach(function(i){$('#'+i).value=''});show('v1')})};
 $('#ed').onclick=function(){var p=cur.profile;if(p){$('#nm').value=p.name;$('#ag').value=p.age;S.g=p.gender;press($('#gd'),p.gender);S.h='cm';S.w='kg';
  document.querySelectorAll('.seg[data-u]').forEach(function(b){press(b,S[b.dataset.u])});
- $('#h').value=p.height_cm;$('#w').value=p.weight_kg;$('#mc').value=p.condition||'';$('#md').value=p.medicine||'';calc()}edit(true);show('v2')};
+ $('#h').value=p.height_cm;$('#w').value=p.weight_kg;$('#mc').value=p.condition||'';setMeds(p.medicines||(p.medicine?[p.medicine]:[]));$('#hcon').checked=!!p.health_consent;calc()}edit(true);show('v2')};
 
 /* ---------- log in ---------- */
 function busy(on){$('#sb').disabled=$('#gg').disabled=on}
@@ -337,11 +342,21 @@ function calc(){
  p.style.opacity=1;p.style.left=Math.max(0,Math.min(100,(bmi-12)/28*100))+'%';
  $('#bh').textContent=age&&age<18?'For under-18s, BMI is read against growth charts, so treat this category as a rough guide.':'BMI is a general guide. It doesn’t see muscle, bone or body shape.'}
 ['h','w','ag'].forEach(function(i){$('#'+i).addEventListener('input',calc)});
+function addRow(v){var d=document.createElement('div'),i=document.createElement('input'),b=document.createElement('button');
+ d.className='mrow';i.placeholder='Medicine name and dose';i.value=v||'';i.setAttribute('aria-label','Medicine');
+ b.type='button';b.className='x';b.textContent='×';b.setAttribute('aria-label','Remove this medicine');
+ b.onclick=function(){if($('#mds').children.length>1)d.remove();else i.value=''};
+ d.appendChild(i);d.appendChild(b);$('#mds').appendChild(d);return i}
+function meds(){return[].map.call(document.querySelectorAll('#mds input'),function(i){return i.value.trim()}).filter(Boolean)}
+function setMeds(a){$('#mds').innerHTML='';(a&&a.length?a:['']).forEach(addRow)}
+$('#addm').onclick=function(){if($('#mds').children.length>=10){toast('You can add up to 10 medicines.');return}addRow('').focus()};
+addRow('');
 function data(){
  var nm=$('#nm').value.trim(),ag=parseFloat($('#ag').value),h=parseFloat($('#h').value),w=parseFloat($('#w').value);
  if(!nm)return'Add your name.';if(!(ag>=1&&ag<=120))return'Enter an age between 1 and 120.';if(!S.g)return'Choose a gender.';
  if(bmi===null)return'Enter a realistic height and weight.';
- return{name:nm,age:ag,gender:S.g,height_cm:Math.round((S.h==='in'?h*2.54:h)*10)/10,weight_kg:Math.round((S.w==='lb'?w/2.20462:w)*10)/10,bmi:Math.round(bmi*10)/10,category:cat,condition:$('#mc').value.trim(),medicine:$('#md').value.trim(),created:(cur&&cur.profile&&cur.profile.created)||Date.now(),updated:Date.now()}}
+ if(($('#mc').value.trim()||meds().length)&&!$('#hcon').checked)return'Tick the health data consent box to save your health details, or clear those fields.';
+ return{name:nm,age:ag,gender:S.g,height_cm:Math.round((S.h==='in'?h*2.54:h)*10)/10,weight_kg:Math.round((S.w==='lb'?w/2.20462:w)*10)/10,bmi:Math.round(bmi*10)/10,category:cat,condition:$('#mc').value.trim(),medicines:meds(),health_consent:!!$('#hcon').checked,created:(cur&&cur.profile&&cur.profile.created)||Date.now(),updated:Date.now()}}
 function creds(){var id=$('#nid').value.trim().toLowerCase(),pw=$('#npw').value;
  if(!/^[a-z0-9_]{3,20}$/.test(id))return'Your ID must be 3 to 20 letters, numbers or underscores.';
  if(pw.length<6)return'Password needs at least 6 characters.';
