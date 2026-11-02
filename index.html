@@ -75,6 +75,12 @@ input:focus,textarea:focus{border-color:var(--ink)}
 .acts{display:flex;flex-wrap:wrap;gap:12px}
 .or{display:flex;align-items:center;gap:12px;color:var(--mu);margin:16px 0;font-size:.9rem}.or::before,.or::after{content:"";flex:1;height:1.5px;background:var(--ln)}
 .btn[disabled]{opacity:.6;cursor:wait}
+.chk{display:flex;gap:10px;align-items:flex-start;margin:0 0 14px;cursor:pointer}
+.chk input{width:20px;height:20px;padding:0;margin:3px 0 0;flex:none;accent-color:var(--br)}
+.cap{display:flex;align-items:center;gap:10px}
+.cap svg{flex:1;min-width:0;max-width:240px;border:1.5px solid var(--ln);border-radius:10px}
+.cap button{border:1.5px solid var(--ln);background:var(--sf);color:var(--ink);border-radius:999px;padding:8px 14px;font:600 .9rem Figtree,sans-serif;cursor:pointer}
+.capin{margin:10px 0 14px}
 </style>
 </head>
 <body>
@@ -119,23 +125,20 @@ input:focus,textarea:focus{border-color:var(--ink)}
  </div>
 </main>
 
-<!-- VIEW 4: ACCOUNT -->
+<!-- VIEW 4: LOG IN -->
 <main class="view" id="v4">
  <div class="wrap"><div class="form">
   <button class="back" id="b4">&larr; Back</button>
-  <h2 id="at">Create your account</h2>
-  <p class="lead" style="margin-bottom:0" id="as">Pick a unique ID and a password. You stay logged in on this device, so you don’t have to sign in every time.</p>
+  <h2>Welcome back</h2>
+  <p class="lead" style="margin-bottom:0">Log in with your ID and password, or with Google.</p>
   <div class="card">
-   <div class="seg" id="am" role="group" aria-label="Account mode"><button type="button" aria-pressed="true" data-v="new">Create account</button><button type="button" aria-pressed="false" data-v="old">Log in</button></div>
-   <div style="height:18px"></div>
-   <label class="f"><span class="lh">Your ID <small>letters, numbers, _</small></span><input id="uid" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="20" placeholder="e.g. abhishek_k"></label>
-   <label class="f"><span class="lh">Password <small>at least 6 characters</small></span><input id="pw" type="password" autocomplete="new-password" placeholder="Password"></label>
-   <label class="f" id="cf"><span class="lh">Confirm password</span><input id="pw2" type="password" autocomplete="new-password" placeholder="Type it again"></label>
-   <button class="btn" id="sb" style="width:100%">Create account</button>
+   <label class="f"><span class="lh">Your ID</span><input id="uid" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="20" placeholder="Your ID"></label>
+   <label class="f"><span class="lh">Password</span><input id="pw" type="password" autocomplete="current-password" placeholder="Password"></label>
+   <button class="btn" id="sb" style="width:100%">Log in</button>
    <div class="or"><span>or</span></div>
-   <button class="btn alt" id="gg" style="width:100%"><svg width="22" height="22" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.600 20.100H42V20H24v8h11.300A12 12 0 1 1 24 12c3.100 0 5.800 1.100 8 3l5.700-5.700A20 20 0 1 0 44 24c0-1.300-.1-2.600-.4-3.900z"/><path fill="#FF3D00" d="M6.300 14.700l6.600 4.800A12 12 0 0 1 24 12c3.100 0 5.800 1.100 8 3l5.700-5.700A20 20 0 0 0 6.300 14.700z"/><path fill="#4CAF50" d="M24 44c5.200 0 9.900-2 13.400-5.200l-6.200-5.200A12 12 0 0 1 12.700 28l-6.500 5C9.500 39.600 16.200 44 24 44z"/><path fill="#1976D2" d="M43.600 20.100H42V20H24v8h11.300a12 12 0 0 1-4.100 5.600l6.200 5.200C37 39.200 44 34 44 24c0-1.300-.1-2.600-.4-3.900z"/></svg>Continue with Google</button>
+   <div id="capL"></div>
+   <button class="btn alt" id="gg" style="width:100%"><svg width="22" height="22" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.600 20.100H42V20H24v8h11.300A12 12 0 1 1 24 12c3.100 0 5.800 1.100 8 3l5.700-5.700A20 20 0 1 0 44 24c0-1.300-.1-2.600-.4-3.900z"/><path fill="#FF3D00" d="M6.300 14.700l6.600 4.800A12 12 0 0 1 24 12c3.100 0 5.800 1.100 8 3l5.700-5.700A20 20 0 0 0 6.300 14.700z"/><path fill="#4CAF50" d="M24 44c5.200 0 9.900-2 13.400-5.200l-6.200-5.200A12 12 0 0 1 12.700 28l-6.500 5C9.500 39.600 16.200 44 24 44z"/><path fill="#1976D2" d="M43.600 20.100H42V20H24v8h11.300a12 12 0 0 1-4.100 5.600l6.200 5.200C37 39.200 44 34 44 24c0-1.300-.1-2.600-.4-3.900z"/></svg>Log in with Google</button>
    <p class="err" id="er" role="alert"></p>
-   <div class="warn"><svg viewBox="0 0 28 28" aria-hidden="true"><path d="M14 3L2 25h24z" fill="#F59E0B" stroke="#F59E0B" stroke-width="2" stroke-linejoin="round"/><path d="M14 11v7" stroke="#1E2A22" stroke-width="2.500" stroke-linecap="round"/><circle cx="14" cy="21.500" r="1.500" fill="#1E2A22"/></svg><span id="wn"></span></div>
   </div>
  </div></div>
 </main>
@@ -175,7 +178,27 @@ input:focus,textarea:focus{border-color:var(--ink)}
     <label class="f" style="margin-bottom:0"><span class="lh">What medicine do you take?</span><input id="md" placeholder="Leave blank to skip"></label>
    </div>
 
-   <div class="card"><button class="btn" id="sv" style="width:100%">Save my profile</button><p class="err" id="e2" role="alert"></p></div>
+   <div class="card" id="lcard">
+    <h3><svg viewBox="0 0 40 40" aria-hidden="true"><use href="#cherry"/></svg>Your login</h3>
+    <label class="f"><span class="lh">Your ID <small>letters, numbers, _</small></span><input id="nid" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="20" placeholder="e.g. abhishek_k"></label>
+    <div class="row">
+     <label class="f"><span class="lh">Password <small>6+ characters</small></span><input id="npw" type="password" autocomplete="new-password" placeholder="Password"></label>
+     <label class="f"><span class="lh">Confirm password</span><input id="npw2" type="password" autocomplete="new-password" placeholder="Type it again"></label>
+    </div>
+    <p class="hint" style="margin:0">You use this ID and password to log back in when your data is stored on this device. With Google, you log in with your Google account instead.</p>
+   </div>
+   <div class="card" id="fcard">
+    <h3><svg viewBox="0 0 40 40" aria-hidden="true"><use href="#grapes"/></svg>Where should we keep your data?</h3>
+    <label class="chk"><input type="checkbox" id="a18"><span>I am 18 years old or older.</span></label>
+    <div id="capS"></div>
+    <div class="go">
+     <button class="btn" id="sg"><svg width="22" height="22" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.600 20.100H42V20H24v8h11.300A12 12 0 1 1 24 12c3.100 0 5.800 1.100 8 3l5.700-5.700A20 20 0 1 0 44 24c0-1.300-.1-2.600-.4-3.900z"/><path fill="#FF3D00" d="M6.300 14.700l6.600 4.800A12 12 0 0 1 24 12c3.100 0 5.800 1.100 8 3l5.700-5.700A20 20 0 0 0 6.300 14.700z"/><path fill="#4CAF50" d="M24 44c5.200 0 9.900-2 13.400-5.200l-6.200-5.200A12 12 0 0 1 12.700 28l-6.500 5C9.500 39.600 16.200 44 24 44z"/><path fill="#1976D2" d="M43.600 20.100H42V20H24v8h11.300a12 12 0 0 1-4.100 5.600l6.200 5.200C37 39.200 44 34 44 24c0-1.300-.1-2.600-.4-3.900z"/></svg>Sign up with Google (permanent)</button>
+     <button class="btn alt" id="sd">Store data on this device</button>
+    </div>
+    <p class="err" id="e2" role="alert"></p>
+    <div class="warn"><svg viewBox="0 0 28 28" aria-hidden="true"><path d="M14 3L2 25h24z" fill="#F59E0B" stroke="#F59E0B" stroke-width="2" stroke-linejoin="round"/><path d="M14 11v7" stroke="#1E2A22" stroke-width="2.500" stroke-linecap="round"/><circle cx="14" cy="21.500" r="1.500" fill="#1E2A22"/></svg><span>Note: device-only data is deleted for good if your device or browser data is erased, and it can’t be recovered. You can export your data before a reset. On this device, IDs are unique only among accounts here. Google keeps your data safe in the cloud.</span></div>
+   </div>
+   <div class="card" id="svc" style="display:none"><button class="btn" id="sv" style="width:100%">Save changes</button><p class="err" id="e3" role="alert"></p></div>
   </div>
  </div>
 </main>
@@ -194,8 +217,7 @@ input:focus,textarea:focus{border-color:var(--ink)}
 <script>
 (function(){
 var $=function(s){return document.querySelector(s)},V=['v1','v2','v3','v4'];
-/* Cloud mode: paste your Firebase web config below (works only when this file is hosted on your own site).
-   Example: {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."} */
+/* Cloud mode: paste your Firebase web config below (works only when hosted on your own site). */
 var FIREBASE_CONFIG={
   apiKey:"AIzaSyDFspjVAIpsXpmYXhiDGiFZGxCpt-giyuk",
   authDomain:"health-is-wealth-b4dfc.firebaseapp.com",
@@ -204,13 +226,13 @@ var FIREBASE_CONFIG={
   messagingSenderId:"363135219448",
   appId:"1:363135219448:web:42187af123f987ff5b6d0d"
 };
-var S={g:'',h:'cm',w:'kg'},bmi=null,cat='',mode='new',cur=null;
+var S={g:'',h:'cm',w:'kg'},bmi=null,cat='',cur=null;
 function show(n){V.forEach(function(v){$('#'+v).classList.toggle('on',v===n)});window.scrollTo(0,0)}
 function toast(m){var t=$('#t');t.textContent=m;t.classList.add('on');clearTimeout(toast.i);toast.i=setTimeout(function(){t.classList.remove('on')},3200)}
 function press(box,v){box.querySelectorAll('button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.v===v)})}
 function msg(e){return typeof e==='string'?e:'Something went wrong. Please try again.'}
 
-/* ---------- local (this device) backend ---------- */
+/* ---------- device storage ---------- */
 var LS={get:function(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set:function(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}};
 function b64(b){return btoa(String.fromCharCode.apply(null,new Uint8Array(b)))}
 function hash(pw,salt){
@@ -218,71 +240,86 @@ function hash(pw,salt){
  return crypto.subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveBits']).then(function(k){
   return crypto.subtle.deriveBits({name:'PBKDF2',salt:salt,iterations:150000,hash:'SHA-256'},k,256)}).then(b64)}
 var local={
- signup:function(id,pw){var a=LS.get('ct.accounts',{});if(a[id])return Promise.reject('That ID is already taken. Try another.');
+ create:function(id,pw,p){var a=LS.get('ct.accounts',{});if(a[id])return Promise.reject('That ID is already taken on this device. Try another.');
   var salt=crypto.getRandomValues(new Uint8Array(16));
-  return hash(pw,salt).then(function(x){a[id]={salt:b64(salt),hash:x};if(!LS.set('ct.accounts',a))throw'This browser blocked saving. Turn off private mode and try again.';LS.set('ct.session',id);return{id:id}})},
+  return hash(pw,salt).then(function(x){a[id]={salt:b64(salt),hash:x,profile:p};if(!LS.set('ct.accounts',a))throw'This browser blocked saving. Turn off private mode and try again.';LS.set('ct.session',id);return{type:'device',id:id,profile:p}})},
  login:function(id,pw){var r=LS.get('ct.accounts',{})[id];if(!r)return Promise.reject('No account with that ID on this device.');
   var salt=Uint8Array.from(atob(r.salt),function(c){return c.charCodeAt(0)});
-  return hash(pw,salt).then(function(x){if(x!==r.hash)throw'Wrong password.';LS.set('ct.session',id);return{id:id,profile:r.profile}})},
- google:function(){return Promise.reject('Google sign-in needs Firebase. Add your Firebase config first.')},
+  return hash(pw,salt).then(function(x){if(x!==r.hash)throw'Wrong password.';LS.set('ct.session',id);return{type:'device',id:id,profile:r.profile}})},
  save:function(u,p){var a=LS.get('ct.accounts',{});a[u.id].profile=p;return LS.set('ct.accounts',a)?Promise.resolve():Promise.reject('Saving failed. Your browser may be blocking storage.')},
- restore:function(){var id=LS.get('ct.session',null),a=LS.get('ct.accounts',{});return Promise.resolve(id&&a[id]?{id:id,profile:a[id].profile}:null)},
+ restore:function(){var id=LS.get('ct.session',null),a=LS.get('ct.accounts',{});return Promise.resolve(id&&a[id]?{type:'device',id:id,profile:a[id].profile}:null)},
  out:function(){LS.set('ct.session',null);return Promise.resolve()}
 };
 
-/* ---------- cloud (Firebase) backend ---------- */
+/* ---------- Google + cloud (Firebase) ---------- */
 var fbp=null;
 function fbLoad(){if(fbp)return fbp;var u='https://www.gstatic.com/firebasejs/10.12.2/';
  fbp=Promise.all([import(u+'firebase-app.js'),import(u+'firebase-auth.js'),import(u+'firebase-firestore.js')]).then(function(m){
   var app=m[0].initializeApp(FIREBASE_CONFIG);return{a:m[1],f:m[2],auth:m[1].getAuth(app),db:m[2].getFirestore(app)}});return fbp}
-var DOM='@calorietracker.app';
 function fbErr(e){var c=(e&&e.code)||'';
- return c==='auth/email-already-in-use'?'That ID is already taken. Try another.':
- (c==='auth/invalid-credential'||c==='auth/wrong-password'||c==='auth/user-not-found')?'ID or password is wrong.':
- c==='auth/weak-password'?'Use at least 6 characters.':c==='auth/popup-closed-by-user'?'Google sign-in was closed.':
- 'Cloud sign-in failed. Check your Firebase setup and connection.'}
+ return c==='auth/popup-closed-by-user'||c==='auth/cancelled-popup-request'?'Google sign-in was closed.':
+ c==='auth/popup-blocked'?'Your browser blocked the Google popup. Allow popups for this site and try again.':
+ c==='auth/unauthorized-domain'?'This website is not in Firebase Authorized domains. Add it in Authentication, Settings.':
+ c==='auth/operation-not-allowed'?'Google sign-in is off. Turn it on in Firebase Authentication, Sign-in method.':
+ (c==='auth/invalid-api-key'||c==='auth/api-key-not-valid.-please-pass-a-valid-api-key.')?'The Firebase API key is blocked or wrong. Check its website restrictions.':
+ c==='auth/network-request-failed'?'Network problem. Check your internet and try again.':
+ 'Cloud sign-in failed ('+(c||'unknown error')+'). Check your Firebase setup and connection.'}
 function loadP(x,uid){return x.f.getDoc(x.f.doc(x.db,'users',uid)).then(function(s){return s.exists()?s.data():null})}
-function who(u){return u.email&&u.email.slice(-DOM.length)===DOM?u.email.slice(0,-DOM.length):(u.displayName||'friend')}
 var cloud={
- signup:function(id,pw){return fbLoad().then(function(x){return x.a.createUserWithEmailAndPassword(x.auth,id+DOM,pw).then(function(c){return{id:id,uid:c.user.uid}})}).catch(function(e){throw fbErr(e)})},
- login:function(id,pw){return fbLoad().then(function(x){return x.a.signInWithEmailAndPassword(x.auth,id+DOM,pw).then(function(c){return loadP(x,c.user.uid).then(function(p){return{id:id,uid:c.user.uid,profile:p}})})}).catch(function(e){throw fbErr(e)})},
- google:function(){return fbLoad().then(function(x){return x.a.signInWithPopup(x.auth,new x.a.GoogleAuthProvider()).then(function(c){return loadP(x,c.user.uid).then(function(p){return{id:who(c.user),uid:c.user.uid,profile:p}})})}).catch(function(e){throw fbErr(e)})},
+ google:function(){if(!FIREBASE_CONFIG)return Promise.reject('Google sign-in works on the hosted version with Firebase. On this preview, use device storage.');
+  return fbLoad().then(function(x){return x.a.signInWithPopup(x.auth,new x.a.GoogleAuthProvider()).then(function(c){LS.set('ct.cloud',1);return loadP(x,c.user.uid).then(function(p){return{type:'google',id:c.user.displayName||'friend',uid:c.user.uid,profile:p}})})}).catch(function(e){throw fbErr(e)})},
  save:function(u,p){return fbLoad().then(function(x){return x.f.setDoc(x.f.doc(x.db,'users',u.uid),p)}).catch(function(){throw'Saving to the cloud failed. Check your connection and Firestore rules.'})},
- restore:function(){return fbLoad().then(function(x){return new Promise(function(res){var off=x.a.onAuthStateChanged(x.auth,function(u){off();if(!u)return res(null);loadP(x,u.uid).then(function(p){res({id:who(u),uid:u.uid,profile:p})}).catch(function(){res(null)})})})}).catch(function(){return null})},
- out:function(){return fbLoad().then(function(x){return x.a.signOut(x.auth)}).catch(function(){})}
+ restore:function(){return fbLoad().then(function(x){return new Promise(function(res){var off=x.a.onAuthStateChanged(x.auth,function(u){off();if(!u)return res(null);loadP(x,u.uid).then(function(p){res({type:'google',id:u.displayName||'friend',uid:u.uid,profile:p})}).catch(function(){res(null)})})})}).catch(function(){return null})},
+ out:function(){LS.set('ct.cloud',null);if(!FIREBASE_CONFIG)return Promise.resolve();return fbLoad().then(function(x){return x.a.signOut(x.auth)}).catch(function(){})}
 };
-var B=FIREBASE_CONFIG?cloud:local;
-$('#wn').textContent=FIREBASE_CONFIG?'Your account and data are stored securely in the cloud, so they survive a device reset. Your ID is unique across everyone.':'Accounts are saved on this device only. If your device or browser data is erased, they are deleted for good and can’t be recovered, so export your data before any reset. IDs are unique on this device.';
+if(FIREBASE_CONFIG)fbLoad().catch(function(){});
 
-/* ---------- account flow ---------- */
-function setMode(m){mode=m;press($('#am'),m);var n=m==='new';
- $('#cf').style.display=n?'':'none';$('#sb').textContent=n?'Create account':'Log in';
- $('#at').textContent=n?'Create your account':'Welcome back';
- $('#as').textContent=n?'Pick a unique ID and a password. You stay logged in on this device, so you don’t have to sign in every time.':'Log in with your ID and password.';
- $('#pw').autocomplete=n?'new-password':'current-password';$('#er').textContent=''}
-function busy(on){$('#sb').disabled=$('#gg').disabled=on}
-function fail(e){busy(false);$('#er').textContent=msg(e)}
-function enter(u){busy(false);cur=u;if(u.profile)home();else show('v2')}
+/* ---------- word captcha + cooldown (slows repeated Google attempts) ---------- */
+var WORDS=['apple','mango','lemon','peach','grape','melon','berry','guava','olive','cherry','banana','papaya','orange','plum','kiwi','pear'],COL=['#E5383B','#FF9F1C','#2E9E4F','#7B3FBF','#3B82F6','#D92B52'],NEXT=0;
+function mkCap(box){
+ var w='';
+ box.innerHTML='<p class="hint" style="margin:0 0 8px">Type the word you see to use Google.</p><div class="cap"><svg viewBox="0 0 200 56" role="img" aria-label="Captcha word"></svg><button type="button">New word</button></div><input class="capin" autocomplete="off" autocapitalize="none" spellcheck="false" aria-label="Captcha word" placeholder="Type the word">';
+ var svg=box.querySelector('svg'),inp=box.querySelector('input'),r=Math.random;
+ function draw(){
+  w=WORDS[Math.floor(r()*WORDS.length)];inp.value='';
+  var s='<rect width="200" height="56" rx="10" style="fill:var(--bg)"/>',i,step=170/w.length;
+  for(i=0;i<4;i++)s+='<path d="M'+Math.round(r()*30)+' '+Math.round(8+r()*40)+'Q100 '+Math.round(r()*56)+' '+Math.round(170+r()*30)+' '+Math.round(8+r()*40)+'" stroke="'+COL[Math.floor(r()*6)]+'" stroke-width="2" fill="none" opacity=".55"/>';
+  for(i=0;i<w.length;i++){var x=18+i*step,y=36+Math.round(r()*8-4),a=Math.round(r()*40-20);
+   s+='<text x="'+x+'" y="'+y+'" font-size="30" font-weight="800" font-family="Bricolage Grotesque,Figtree,sans-serif" fill="'+COL[Math.floor(r()*6)]+'" transform="rotate('+a+' '+x+' '+y+')">'+w[i]+'</text>'}
+  svg.innerHTML=s}
+ box.querySelector('button').onclick=draw;draw();
+ return{ok:function(){var good=inp.value.trim().toLowerCase()===w;draw();return good}}}
+var capS=mkCap($('#capS')),capL=mkCap($('#capL'));
+function gate(cap){var n=Date.now();
+ if(n<NEXT)return'Please wait '+Math.ceil((NEXT-n)/1000)+' seconds before trying again.';
+ if(!cap.ok()){NEXT=n+3000;return'That word doesn’t match. Try the new one.'}
+ NEXT=n+8000;return''}
+function adult(d){if(!$('#a18').checked)return'Please confirm that you are 18 or older.';
+ if(d.age<18)return'You need to be 18 or older to sign up. Please check the age you entered.';return''}
+
+/* ---------- navigation ---------- */
+function edit(on){$('#lcard').style.display=$('#fcard').style.display=on?'none':'';$('#svc').style.display=on?'':'none'}
 function home(){var p=cur.profile;$('#dn').textContent='Welcome, '+p.name;
- $('#ds').textContent='Your BMI is '+p.bmi.toFixed(1)+' ('+p.category.toLowerCase()+'). Your details are saved. Your food diary comes next.';show('v3')}
-$('#go').onclick=function(){setMode('new');show('v4')};
-$('#lg').onclick=function(){setMode('old');show('v4')};
+ $('#ds').textContent='Your BMI is '+p.bmi.toFixed(1)+' ('+p.category.toLowerCase()+'). Your details are saved '+(cur.type==='google'?'in the cloud':'on this device')+'. Your food diary comes next.';show('v3')}
+function enter(u){cur=u;if(u.profile)home();else{edit(false);show('v2')}}
+$('#go').onclick=function(){edit(false);show('v2')};
+$('#lg').onclick=function(){$('#er').textContent='';show('v4')};
 $('#b4').onclick=function(){show('v1')};
-$('#am').onclick=function(e){var b=e.target.closest('button');if(b)setMode(b.dataset.v)};
-$('#sb').onclick=function(){
- var id=$('#uid').value.trim().toLowerCase(),pw=$('#pw').value,e=$('#er');e.textContent='';
- if(!/^[a-z0-9_]{3,20}$/.test(id)){e.textContent='ID must be 3 to 20 letters, numbers or underscores.';return}
- if(pw.length<6){e.textContent='Password needs at least 6 characters.';return}
- if(mode==='new'&&pw!==$('#pw2').value){e.textContent='Passwords don’t match.';return}
- busy(true);(mode==='new'?B.signup(id,pw):B.login(id,pw)).then(enter).catch(fail)};
-$('#gg').onclick=function(){$('#er').textContent='';busy(true);B.google().then(enter).catch(fail)};
-$('#lo').onclick=function(){B.out().then(function(){cur=null;['uid','pw','pw2'].forEach(function(i){$('#'+i).value=''});setMode('old');show('v1')})};
 $('#bk').onclick=function(){cur&&cur.profile?home():show('v1')};
+$('#lo').onclick=function(){Promise.all([local.out(),cloud.out()]).then(function(){cur=null;['uid','pw','nid','npw','npw2'].forEach(function(i){$('#'+i).value=''});show('v1')})};
 $('#ed').onclick=function(){var p=cur.profile;if(p){$('#nm').value=p.name;$('#ag').value=p.age;S.g=p.gender;press($('#gd'),p.gender);S.h='cm';S.w='kg';
  document.querySelectorAll('.seg[data-u]').forEach(function(b){press(b,S[b.dataset.u])});
- $('#h').value=p.height_cm;$('#w').value=p.weight_kg;$('#mc').value=p.condition||'';$('#md').value=p.medicine||'';calc()}show('v2')};
+ $('#h').value=p.height_cm;$('#w').value=p.weight_kg;$('#mc').value=p.condition||'';$('#md').value=p.medicine||'';calc()}edit(true);show('v2')};
 
-/* ---------- profile + BMI ---------- */
+/* ---------- log in ---------- */
+function busy(on){$('#sb').disabled=$('#gg').disabled=on}
+function fail(e){busy(false);$('#er').textContent=msg(e)}
+$('#sb').onclick=function(){var id=$('#uid').value.trim().toLowerCase(),pw=$('#pw').value,e=$('#er');e.textContent='';
+ if(!id||!pw){e.textContent='Enter your ID and password.';return}
+ busy(true);local.login(id,pw).then(function(u){busy(false);enter(u)}).catch(fail)};
+$('#gg').onclick=function(){var m=gate(capL);$('#er').textContent=m;if(m)return;busy(true);cloud.google().then(function(u){busy(false);enter(u)}).catch(fail)};
+
+/* ---------- details + BMI ---------- */
 $('#gd').onclick=function(e){var b=e.target.closest('button');if(b){S.g=b.dataset.v;press(this,S.g)}};
 document.querySelectorAll('.seg[data-u]').forEach(function(box){box.onclick=function(e){
  var b=e.target.closest('button');if(!b)return;var k=box.dataset.u,n=b.dataset.v,o=S[k];if(n===o)return;
@@ -305,11 +342,22 @@ function data(){
  if(!nm)return'Add your name.';if(!(ag>=1&&ag<=120))return'Enter an age between 1 and 120.';if(!S.g)return'Choose a gender.';
  if(bmi===null)return'Enter a realistic height and weight.';
  return{name:nm,age:ag,gender:S.g,height_cm:Math.round((S.h==='in'?h*2.54:h)*10)/10,weight_kg:Math.round((S.w==='lb'?w/2.20462:w)*10)/10,bmi:Math.round(bmi*10)/10,category:cat,condition:$('#mc').value.trim(),medicine:$('#md').value.trim(),created:(cur&&cur.profile&&cur.profile.created)||Date.now(),updated:Date.now()}}
-$('#sv').onclick=function(){var d=data(),e=$('#e2');if(typeof d==='string'){e.textContent=d;return}e.textContent='';
- B.save(cur,d).then(function(){cur.profile=d;home()}).catch(function(x){e.textContent=msg(x)})};
+function creds(){var id=$('#nid').value.trim().toLowerCase(),pw=$('#npw').value;
+ if(!/^[a-z0-9_]{3,20}$/.test(id))return'Your ID must be 3 to 20 letters, numbers or underscores.';
+ if(pw.length<6)return'Password needs at least 6 characters.';
+ if(pw!==$('#npw2').value)return'Passwords don’t match.';
+ return{id:id,pw:pw}}
+function busy2(on){$('#sd').disabled=$('#sg').disabled=on}
+function fail2(e){busy2(false);$('#e2').textContent=msg(e)}
+$('#sd').onclick=function(){var d=data(),e=$('#e2');e.textContent='';
+ if(typeof d==='string'){e.textContent=d;return}var a=adult(d);if(a){e.textContent=a;return}var c=creds();if(typeof c==='string'){e.textContent=c;return}
+ busy2(true);local.create(c.id,c.pw,d).then(function(u){busy2(false);cur=u;home()}).catch(fail2)};
+$('#sg').onclick=function(){var d=data(),e=$('#e2');e.textContent='';if(typeof d==='string'){e.textContent=d;return}var a=adult(d)||gate(capS);if(a){e.textContent=a;return}
+ busy2(true);cloud.google().then(function(u){if(u.profile&&u.profile.created)d.created=u.profile.created;return cloud.save(u,d).then(function(){u.profile=d;busy2(false);cur=u;home()})}).catch(fail2)};
+$('#sv').onclick=function(){var d=data(),e=$('#e3');e.textContent='';if(typeof d==='string'){e.textContent=d;return}
+ (cur.type==='google'?cloud:local).save(cur,d).then(function(){cur.profile=d;home()}).catch(function(x){e.textContent=msg(x)})};
 
-setMode('new');
-B.restore().then(function(u){if(u){cur=u;u.profile?home():show('v2')}}).catch(function(){});
+local.restore().then(function(u){return u||(FIREBASE_CONFIG&&LS.get('ct.cloud',null)?cloud.restore():null)}).then(function(u){if(u){cur=u;if(u.profile)home();else{edit(false);show('v2')}}}).catch(function(){});
 })();
 </script>
 </body>
