@@ -302,8 +302,8 @@ var local={
 var FIREBASE_CONFIG={apiKey:"AIzaSyBrSPLfOfjO7Ss8efpBgSmgvv9HQbz8cvA",authDomain:"health-a3f9e.firebaseapp.com",projectId:"health-a3f9e",storageBucket:"health-a3f9e.firebasestorage.app",messagingSenderId:"647339089288",appId:"1:647339089288:web:4a5c5ed1bef5853785ae3d"};
 /* e.g. {apiKey:"...",authDomain:"your-project.firebaseapp.com",projectId:"your-project",storageBucket:"...",messagingSenderId:"...",appId:"..."} */
 var FB_READY=!!(FIREBASE_CONFIG&&FIREBASE_CONFIG.apiKey&&FIREBASE_CONFIG.projectId&&FIREBASE_CONFIG.authDomain);
-var fbp=null;
-function fbLoad(){if(fbp)return fbp;var u='https://www.gstatic.com/firebasejs/11.10.0/';
+var FBV='12.18.0',fbp=null;
+function fbLoad(){if(fbp)return fbp;var u='https://www.gstatic.com/firebasejs/'+FBV+'/';
  fbp=Promise.all([import(u+'firebase-app.js'),import(u+'firebase-auth.js'),import(u+'firebase-firestore.js')]).then(function(m){
   var app=m[0].initializeApp(FIREBASE_CONFIG);return{app:app,a:m[1],f:m[2],auth:m[1].getAuth(app),db:m[2].getFirestore(app)}});
  fbp.catch(function(){fbp=null});return fbp}
@@ -462,9 +462,14 @@ $('#mm').onclick=e=>{const t=e.target.closest('[data-took]'),r=e.target.closest(
 $('#mna').onclick=()=>{const n=$('#mnn').value.trim();if(!n)return;cur.profile.medicines=(cur.profile.medicines||[]).filter(Boolean).concat(n);$('#mnn').value='';saveP();rMed()};
 /* Gemini through Firebase AI Logic (no API key in this file) */
 const ESTSYS='You are a careful nutrition estimator. Use realistic home portions.';
-function aiErr(e){const m=String(e&&e.message||e);return/PERMISSION|403|not been used|API_NOT|disabled|AI Logic|not enabled/i.test(m)?'Gemini is not switched on yet. In Firebase open AI Logic and click Get started for the Gemini Developer API.':/429|quota|RESOURCE_EXHAUSTED/i.test(m)?'Gemini is busy or the free limit is used up. Try again in a minute.':'Gemini could not answer right now. Check your connection and try again.'}
+function aiErr(e){console.error('Gemini error:',e);const m=String(e&&e.message||e),d=' Details: '+m.slice(0,170);
+ return/dynamically imported|Importing a module|module script|Failed to fetch dynamically/i.test(m)?'The Gemini library could not load. Press Ctrl+Shift+R and check your internet.'+d:
+ /429|quota|RESOURCE_EXHAUSTED/i.test(m)?'Gemini is busy or the free limit is used up. Try again in a minute.':
+ /404|not found|not supported/i.test(m)?'Gemini could not find that model.'+d:
+ /403|API key|API_KEY|referer|blocked|PERMISSION|not been used|not enabled|disabled/i.test(m)?'Gemini is blocked for this website. In Google Cloud Console open Credentials, then your Browser key, and allow the Firebase AI Logic API and your website.'+d:
+ 'Gemini could not answer.'+d}
 function gem(sys,parts,json){if(!FB_READY)return Promise.reject('AI needs Firebase to be set up first.');
- return Promise.all([fbLoad(),import('https://www.gstatic.com/firebasejs/11.10.0/firebase-ai.js')]).then(([x,A])=>A.getGenerativeModel(A.getAI(x.app,{backend:new A.GoogleAIBackend()}),Object.assign({model:GEMINI_MODEL,systemInstruction:sys},json?{generationConfig:{responseMimeType:'application/json'}}:{})).generateContent(parts)).then(r=>r.response.text()).catch(e=>{throw aiErr(e)})}
+ return Promise.all([fbLoad(),import('https://www.gstatic.com/firebasejs/'+FBV+'/firebase-ai.js')]).then(([x,A])=>A.getGenerativeModel(A.getAI(x.app,{backend:new A.GoogleAIBackend()}),Object.assign({model:GEMINI_MODEL,systemInstruction:sys},json?{generationConfig:{responseMimeType:'application/json'}}:{})).generateContent(parts)).then(r=>r.response.text()).catch(e=>{throw aiErr(e)})}
 function pj(t){try{return JSON.parse(t.replace(/^\s*```(?:json)?|```\s*$/g,'').trim())}catch(_){throw'Gemini’s answer could not be read. Please try again.'}}
 /* scanner */
 const shrink=(el,mw)=>{const w=el.videoWidth||el.naturalWidth,h=el.videoHeight||el.naturalHeight,k=Math.min(1,mw/Math.max(w,h)),c=document.createElement('canvas');c.width=Math.round(w*k);c.height=Math.round(h*k);c.getContext('2d').drawImage(el,0,0,c.width,c.height);return c.toDataURL('image/jpeg',.8)};
