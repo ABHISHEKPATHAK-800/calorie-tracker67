@@ -412,7 +412,7 @@ $('#sv').onclick=function(){var d=data(),e=$('#e3');e.textContent='';if(typeof d
  (cur.type==='google'?cloud:local).save(cur,d).then(function(){cur.profile=d;home()}).catch(function(x){e.textContent=msg(x)})};
 
 /* ---------- dashboard: calories, history, scanner, AI coach, medicines ---------- */
-const GEMINI_MODEL='gemini-2.5-flash';
+const GEMINI_MODELS=['gemini-3.8-flash','gemini-3.7-flash','gemini-3.5-flash-lite'];/* tried in order if one is not found */
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const pad=n=>String(n).padStart(2,'0'),kd=d=>{d=d||new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())};
 const hm=t=>{const d=new Date(t);return pad(d.getHours())+':'+pad(d.getMinutes())},nice=k=>new Date(k+'T00:00').toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short'});
@@ -469,7 +469,8 @@ function aiErr(e){console.error('Gemini error:',e);const m=String(e&&e.message||
  /403|API key|API_KEY|referer|blocked|PERMISSION|not been used|not enabled|disabled/i.test(m)?'Gemini is blocked for this website. In Google Cloud Console open Credentials, then your Browser key, and allow the Firebase AI Logic API and your website.'+d:
  'Gemini could not answer.'+d}
 function gem(sys,parts,json){if(!FB_READY)return Promise.reject('AI needs Firebase to be set up first.');
- return Promise.all([fbLoad(),import('https://www.gstatic.com/firebasejs/'+FBV+'/firebase-ai.js')]).then(([x,A])=>A.getGenerativeModel(A.getAI(x.app,{backend:new A.GoogleAIBackend()}),Object.assign({model:GEMINI_MODEL,systemInstruction:sys},json?{generationConfig:{responseMimeType:'application/json'}}:{})).generateContent(parts)).then(r=>r.response.text()).catch(e=>{throw aiErr(e)})}
+ return Promise.all([fbLoad(),import('https://www.gstatic.com/firebasejs/'+FBV+'/firebase-ai.js')]).then(([x,A])=>{const ai=A.getAI(x.app,{backend:new A.GoogleAIBackend()}),
+  go=i=>A.getGenerativeModel(ai,Object.assign({model:GEMINI_MODELS[i],systemInstruction:sys},json?{generationConfig:{responseMimeType:'application/json'}}:{})).generateContent(parts).catch(e=>{if(i<GEMINI_MODELS.length-1&&/404|not found/i.test(String(e&&e.message||e)))return go(i+1);throw e});return go(0)}).then(r=>r.response.text()).catch(e=>{throw aiErr(e)})}
 function pj(t){try{return JSON.parse(t.replace(/^\s*```(?:json)?|```\s*$/g,'').trim())}catch(_){throw'Gemini’s answer could not be read. Please try again.'}}
 /* scanner */
 const shrink=(el,mw)=>{const w=el.videoWidth||el.naturalWidth,h=el.videoHeight||el.naturalHeight,k=Math.min(1,mw/Math.max(w,h)),c=document.createElement('canvas');c.width=Math.round(w*k);c.height=Math.round(h*k);c.getContext('2d').drawImage(el,0,0,c.width,c.height);return c.toDataURL('image/jpeg',.8)};
