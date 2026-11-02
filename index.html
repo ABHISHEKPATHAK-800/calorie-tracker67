@@ -234,12 +234,14 @@ input:focus,textarea:focus{border-color:var(--ink)}
 var $=function(s){return document.querySelector(s)},V=['v1','v2','v3','v4'];
 /* Cloud mode: paste your Firebase web config below (works only when hosted on your own site). */
 var FIREBASE_CONFIG={
-  apiKey:"AIzaSyDFspjVAIpsXpmYXhiDGiFZGxCpt-giyuk",
-  authDomain:"health-is-wealth-b4dfc.firebaseapp.com",
-  projectId:"health-is-wealth-b4dfc",
-  storageBucket:"health-is-wealth-b4dfc.firebasestorage.app",
-  messagingSenderId:"363135219448",
-  appId:"1:363135219448:web:42187af123f987ff5b6d0d"
+  apiKey:"AIzaSyBuJLukVCGfmC4cXMcor7Q9DEU-dzqoZiQ",
+  authDomain:"duotrack-95ff0.firebaseapp.com",
+  databaseURL:"https://duotrack-95ff0-default-rtdb.firebaseio.com",
+  projectId:"duotrack-95ff0",
+  storageBucket:"duotrack-95ff0.firebasestorage.app",
+  messagingSenderId:"184032787518",
+  appId:"1:184032787518:web:9161e851986a08149be56f",
+  measurementId:"G-34JHZBJK5J"
 };
 var S={g:'',h:'cm',w:'kg'},bmi=null,cat='',cur=null;
 function show(n){V.forEach(function(v){$('#'+v).classList.toggle('on',v===n)});window.scrollTo(0,0)}
@@ -268,31 +270,35 @@ var local={
 
 /* ---------- Google + cloud (Firebase) ---------- */
 var fbp=null;
-function fbLoad(){if(fbp)return fbp;var u='https://www.gstatic.com/firebasejs/10.12.2/';
- fbp=Promise.all([import(u+'firebase-app.js'),import(u+'firebase-auth.js'),import(u+'firebase-firestore.js')]).then(function(m){
-  var app=m[0].initializeApp(FIREBASE_CONFIG);return{a:m[1],f:m[2],auth:m[1].getAuth(app),db:m[2].getFirestore(app)}});return fbp}
+function fbLoad(){if(fbp)return fbp;var u='https://www.gstatic.com/firebasejs/10.12.5/';
+ fbp=Promise.all([import(u+'firebase-app.js'),import(u+'firebase-auth.js'),import(u+'firebase-database.js')]).then(function(m){
+  /* A named app keeps this calorie-tracker auth session separate from DuoTrack's protected anonymous sign-in. */
+  var app=m[0].initializeApp(FIREBASE_CONFIG,'CalorieTracker');
+  return{a:m[1],d:m[2],auth:m[1].getAuth(app),db:m[2].getDatabase(app)};
+ });return fbp}
 function fbErr(e){var c=(e&&e.code)||'';
  return c==='auth/popup-closed-by-user'||c==='auth/cancelled-popup-request'?'Google sign-in was closed.':
  c==='auth/popup-blocked'?'Your browser blocked the Google popup. Allow popups for this site and try again.':
- c==='auth/unauthorized-domain'?'This website is not in Firebase Authorized domains. Add it in Authentication, Settings.':
- c==='auth/operation-not-allowed'?'Google sign-in is off. Turn it on in Firebase Authentication, Sign-in method.':
+ c==='auth/unauthorized-domain'?'Add abhishekpathak-800.github.io to Firebase Authentication → Settings → Authorized domains.':
+ c==='auth/operation-not-allowed'?'Enable Google under Firebase Authentication → Sign-in method.':
  (c==='auth/invalid-api-key'||c==='auth/api-key-not-valid.-please-pass-a-valid-api-key.')?'The Firebase API key is blocked or wrong. Check its website restrictions.':
  c==='auth/network-request-failed'?'Network problem. Check your internet and try again.':
  'Cloud sign-in failed ('+(c||'unknown error')+'). Check your Firebase setup and connection.'}
-function loadP(x,uid){return x.f.getDoc(x.f.doc(x.db,'users',uid)).then(function(s){return s.exists()?s.data():null})}
+function profileRef(x,uid){return x.d.ref(x.db,'calorieTracker/users/'+uid)}
+function loadP(x,uid){return x.d.get(profileRef(x,uid)).then(function(s){return s.exists()?s.val():null})}
 var cloud={
  google:function(profile){if(!FIREBASE_CONFIG)return Promise.reject('Google sign-in works on the hosted version with Firebase. On this preview, use device storage.');
   return fbLoad().then(function(x){
    LS.set('ct.pendingProfile',profile||null);LS.set('ct.cloud',1);
    return x.a.signInWithRedirect(x.auth,new x.a.GoogleAuthProvider());
   }).catch(function(e){throw fbErr(e)})},
- save:function(u,p){return fbLoad().then(function(x){return x.f.setDoc(x.f.doc(x.db,'users',u.uid),p)}).catch(function(){throw'Saving to the cloud failed. Check your connection and Firestore rules.'})},
+ save:function(u,p){return fbLoad().then(function(x){return x.d.set(profileRef(x,u.uid),p)}).catch(function(){throw'Saving to the cloud failed. Check your connection and Realtime Database rules.'})},
  restore:function(){return fbLoad().then(function(x){
   function finish(u){if(!u)return Promise.resolve(null);
    return loadP(x,u.uid).then(function(p){
     var pending=LS.get('ct.pendingProfile',null);
     var user={type:'google',id:u.displayName||'friend',uid:u.uid,profile:p};
-    if(pending){return x.f.setDoc(x.f.doc(x.db,'users',u.uid),pending).then(function(){LS.set('ct.pendingProfile',null);user.profile=pending;return user})}
+    if(pending){return x.d.set(profileRef(x,u.uid),pending).then(function(){LS.set('ct.pendingProfile',null);user.profile=pending;return user})}
     return user;
    });
   }
