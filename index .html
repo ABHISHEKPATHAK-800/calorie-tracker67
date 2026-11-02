@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Free Daily Life Calorie Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Figtree:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F1F8EC;--sf:#fff;--ink:#1E2A22;--mu:#566659;--ln:#D4E3CC;--br:#D92B52;--ob:#fff;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121C16;--sf:#1C2B22;--ink:#EDF5E9;--mu:#9CB0A1;--ln:#2D4235;--br:#FF6482;--ob:#2A0712;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#121C16;--sf:#1C2B22;--ink:#EDF5E9;--mu:#9CB0A1;--ln:#2D4235;--br:#FF6482;--ob:#2A0712;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 17px/1.55 Figtree,system-ui,-apple-system,"Segoe UI",sans-serif;overflow-x:hidden}
+h1,h2,.num{font-family:"Bricolage Grotesque",Figtree,system-ui,sans-serif;margin:0;letter-spacing:-.03em}
+.view{display:none;position:relative;z-index:1}.view.on{display:block}
+.bg{position:fixed;width:clamp(70px,11vw,140px);opacity:.14;pointer-events:none;z-index:0}
+.wrap{max-width:1040px;margin:0 auto;padding:24px 20px 48px}
+/* intro */
+.hero{display:grid;gap:28px;align-items:center;min-height:calc(100svh - 72px)}
+.hero .copy{max-width:520px}
+h1{font-size:clamp(2.5rem,8vw,4.5rem);line-height:.98;font-weight:800}
+.lead{font-size:1.15rem;color:var(--mu);margin:16px 0 22px}
+.note{display:flex;gap:14px;align-items:flex-start;background:var(--sf);border:1.5px solid var(--ln);border-radius:20px;padding:16px;margin-bottom:24px;font-size:.98rem}
+.note svg{flex:none;width:44px;height:44px}
+.note b{font-weight:700}
+.cluster{position:relative;width:100%;max-width:380px;aspect-ratio:1;margin:0 auto;order:-1}
+.cluster svg{position:absolute;width:var(--w);left:var(--x);top:var(--y);transform:rotate(var(--r));animation:pop .7s cubic-bezier(.3,1.6,.5,1) both;animation-delay:calc(var(--i)*110ms);filter:drop-shadow(0 6px 8px rgba(0,0,0,.14))}
+@keyframes pop{from{transform:scale(0) rotate(var(--r));opacity:0}to{transform:scale(1) rotate(var(--r));opacity:1}}
+@media(min-width:860px){.hero{grid-template-columns:1.05fr .95fr}.cluster{order:0;max-width:460px}}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;border:2px solid var(--br);background:var(--br);color:var(--ob);font:700 1.05rem Figtree,system-ui,sans-serif;padding:14px 26px;border-radius:999px;cursor:pointer;text-decoration:none}
+.btn.alt{background:var(--sf);color:var(--ink);border-color:var(--ink)}
+.btn:focus-visible,.seg button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.btn:active{transform:scale(.98)}
+/* form */
+.back{background:none;border:0;color:var(--mu);font:600 1rem Figtree,sans-serif;cursor:pointer;padding:8px 0;margin-bottom:8px}
+.form{max-width:600px;margin:0 auto}
+h2{font-size:clamp(1.9rem,6vw,2.7rem);line-height:1.04;font-weight:800}
+.card{background:var(--sf);border:1.5px solid var(--ln);border-radius:24px;padding:22px;margin-top:20px}
+.card h3{font:800 1.15rem "Bricolage Grotesque",Figtree,sans-serif;margin:0 0 14px;display:flex;align-items:center;gap:10px}
+.card h3 svg{width:30px;height:30px}
+.f{display:block;margin-bottom:16px}
+.lh{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px;font-weight:600}
+.lh small,.opt{font-weight:400;color:var(--mu)}
+input,textarea{width:100%;font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1.5px solid var(--ln);border-radius:12px;padding:12px 14px}
+textarea{resize:vertical;min-height:84px}
+input:focus,textarea:focus{border-color:var(--ink)}
+.row{display:grid;gap:0 14px}
+@media(min-width:560px){.row{grid-template-columns:1fr 1fr}}
+.seg{display:inline-flex;flex-wrap:wrap;border:1.5px solid var(--ln);border-radius:999px;padding:3px;gap:2px;background:var(--bg)}
+.seg button{border:0;background:none;color:var(--mu);padding:8px 15px;border-radius:999px;font:600 .95rem Figtree,sans-serif;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+.bmi{border-top:1.5px dashed var(--ln);margin-top:6px;padding-top:18px}
+.bmi .top{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.num{font-size:3.2rem;font-weight:800;line-height:1}
+.chip{--c:var(--mu);border:2px solid var(--c);background:color-mix(in srgb,var(--c) 16%,var(--sf));padding:5px 14px;border-radius:999px;font-weight:700}
+.gw{position:relative;margin:20px 0 6px}
+.g{display:flex;height:12px;border-radius:99px;overflow:hidden}
+.g i{display:block}
+.pin{position:absolute;top:-5px;width:22px;height:22px;border-radius:50%;background:var(--sf);border:4px solid var(--ink);left:0;transform:translateX(-50%);transition:left .5s cubic-bezier(.3,1.4,.5,1);opacity:0}
+.gl{display:flex;font-size:.82rem;color:var(--mu)}
+.gl span{text-align:center}
+.hint{font-size:.9rem;color:var(--mu);margin:10px 0 0}
+.go{display:grid;gap:12px;margin-top:6px}
+.warn{display:flex;gap:12px;align-items:flex-start;margin-top:16px;font-size:.93rem;color:var(--mu)}
+.warn svg{flex:none;width:26px;height:26px}
+.err{color:var(--br);font-weight:600;min-height:1.4em;margin:10px 0 0}
+#t{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,30px);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:14px;max-width:90vw;opacity:0;transition:.3s;z-index:9;font-weight:600;text-align:center;pointer-events:none}
+#t.on{opacity:1;transform:translate(-50%,0)}
+.done{text-align:center;max-width:520px;margin:0 auto;padding-top:6vh}
+.done svg.big{width:150px;margin:0 auto 10px;display:block}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.acts{display:flex;flex-wrap:wrap;gap:12px}
+.or{display:flex;align-items:center;gap:12px;color:var(--mu);margin:16px 0;font-size:.9rem}.or::before,.or::after{content:"";flex:1;height:1.5px;background:var(--ln)}
+.btn[disabled]{opacity:.6;cursor:wait}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="apple" viewBox="0 0 100 100"><path d="M50 32C38 24 14 28 14 54c0 22 15 40 29 40 4 0 4-2 7-2s3 2 7 2c14 0 29-18 29-40 0-26-24-30-36-22z" fill="#E5383B"/><path d="M26 50c0-10 6-14 12-15" stroke="#fff" stroke-opacity=".5" stroke-width="5" stroke-linecap="round" fill="none"/><path d="M50 32c0-9 2-15 7-21" stroke="#6B4226" stroke-width="4" stroke-linecap="round" fill="none"/><path d="M55 22c6-10 20-10 25-6-3 11-15 14-25 6z" fill="#5DB33A"/></symbol>
+<symbol id="orange" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="#FF9F1C"/><circle cx="50" cy="50" r="38" fill="#FFE2A8"/><circle cx="50" cy="50" r="34" fill="#FFB347"/><path d="M50 16v68M16 50h68M26 26l48 48M74 26L26 74" stroke="#FFE2A8" stroke-width="3"/><circle cx="50" cy="50" r="5" fill="#FFE2A8"/></symbol>
+<symbol id="berry" viewBox="0 0 100 100"><path d="M50 95C24 81 11 58 16 42c3-12 20-14 34-8 14-6 31-4 34 8 5 16-8 39-34 53z" fill="#E63956"/><g fill="#FFD66B"><ellipse cx="34" cy="52" rx="2.5" ry="4"/><ellipse cx="50" cy="50" rx="2.5" ry="4"/><ellipse cx="66" cy="52" rx="2.5" ry="4"/><ellipse cx="42" cy="66" rx="2.5" ry="4"/><ellipse cx="58" cy="66" rx="2.5" ry="4"/><ellipse cx="50" cy="80" rx="2.5" ry="4"/></g><path d="M24 36l26 9 26-9-5 14-21-3-21 3z" fill="#4CAF50"/><path d="M50 40V22" stroke="#4CAF50" stroke-width="5" stroke-linecap="round"/></symbol>
+<symbol id="banana" viewBox="0 0 100 100"><path d="M20 20C16 60 38 86 80 84c6 0 8-6 2-8-26-4-38-22-40-52-1-6-20-10-22-4z" fill="#FFD23F" stroke="#E0A200" stroke-width="3" stroke-linejoin="round"/><path d="M20 20c-1-8 2-12 6-14" stroke="#6B4226" stroke-width="6" stroke-linecap="round"/><path d="M30 34c2 22 14 36 34 42" stroke="#fff" stroke-opacity=".45" stroke-width="4" stroke-linecap="round" fill="none"/></symbol>
+<symbol id="melon" viewBox="0 0 100 100"><path d="M6 34h88a44 44 0 0 1-88 0z" fill="#2E9E4F"/><path d="M10 34h80a40 40 0 0 1-80 0z" fill="#DFF5C8"/><path d="M13 34h74a37 37 0 0 1-74 0z" fill="#FF4F6D"/><g fill="#2B1B24"><ellipse cx="32" cy="48" rx="2.6" ry="4.5" transform="rotate(-20 32 48)"/><ellipse cx="50" cy="45" rx="2.6" ry="4.5"/><ellipse cx="68" cy="48" rx="2.6" ry="4.5" transform="rotate(20 68 48)"/><ellipse cx="41" cy="60" rx="2.6" ry="4.5" transform="rotate(-10 41 60)"/><ellipse cx="59" cy="60" rx="2.6" ry="4.5" transform="rotate(10 59 60)"/></g></symbol>
+<symbol id="grapes" viewBox="0 0 100 100"><g fill="#7B3FBF"><circle cx="30" cy="40" r="12"/><circle cx="50" cy="40" r="12"/><circle cx="70" cy="40" r="12"/><circle cx="40" cy="58" r="12"/><circle cx="60" cy="58" r="12"/><circle cx="50" cy="76" r="12"/></g><g fill="#fff" fill-opacity=".4"><circle cx="26" cy="36" r="3"/><circle cx="46" cy="36" r="3"/><circle cx="66" cy="36" r="3"/><circle cx="36" cy="54" r="3"/><circle cx="56" cy="54" r="3"/><circle cx="46" cy="72" r="3"/></g><path d="M50 28V10" stroke="#6B4226" stroke-width="4" stroke-linecap="round"/><path d="M52 16c8-10 24-8 28-2-4 10-18 12-28 2z" fill="#5DB33A"/></symbol>
+<symbol id="pear" viewBox="0 0 100 100"><path d="M50 12c8 0 10 10 10 18 0 9 20 16 20 40 0 15-13 24-30 24S20 85 20 70c0-24 20-31 20-40 0-8 2-18 10-18z" fill="#A6D82A"/><path d="M32 66c0-10 4-16 8-18" stroke="#fff" stroke-opacity=".5" stroke-width="5" stroke-linecap="round" fill="none"/><path d="M50 12c0-4 1-7 4-10" stroke="#6B4226" stroke-width="4" stroke-linecap="round" fill="none"/><path d="M54 16c6-8 18-8 22-4-3 9-14 11-22 4z" fill="#3E9B3B"/></symbol>
+<symbol id="cherry" viewBox="0 0 100 100"><path d="M36 66C36 44 48 26 68 14M68 68C70 46 70 28 68 14" stroke="#4E8A2B" stroke-width="4" stroke-linecap="round" fill="none"/><circle cx="34" cy="74" r="17" fill="#C9184A"/><circle cx="68" cy="76" r="17" fill="#E5234F"/><circle cx="28" cy="68" r="4" fill="#fff" fill-opacity=".5"/><circle cx="62" cy="70" r="4" fill="#fff" fill-opacity=".5"/><path d="M68 16c8-10 22-8 26-2-4 10-18 12-26 2z" fill="#5DB33A"/></symbol>
+</defs></svg>
+
+<svg class="bg" style="left:-1%;top:6%" viewBox="0 0 100 100"><use href="#orange"/></svg>
+<svg class="bg" style="right:-1%;top:44%" viewBox="0 0 100 100"><use href="#grapes"/></svg>
+<svg class="bg" style="left:3%;bottom:2%" viewBox="0 0 100 100"><use href="#pear"/></svg>
+
+<!-- VIEW 1: INTRO -->
+<main class="view on" id="v1">
+ <div class="wrap hero">
+  <div class="copy">
+   <h1>Free daily life calorie tracker</h1>
+   <p class="lead">Log what you eat, watch your day add up, and keep it simple. No fees, no clutter, no forms to fight with.</p>
+   <div class="note">
+    <svg viewBox="0 0 48 48" aria-hidden="true"><rect x="4" y="9" width="30" height="21" rx="3" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M1 34h36" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><rect x="31" y="17" width="13" height="25" rx="3" fill="var(--sf)" stroke="currentColor" stroke-width="2.5"/><circle cx="37.500" cy="38" r="1.400" fill="currentColor"/><path d="M13 20l4 4 8-8" fill="none" stroke="#2E9E4F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div>Signing in feels boring, so we skip it. <b>Your data is stored on your own device.</b> For permanent storage that follows you everywhere, we recommend signing in with Google.</div>
+   </div>
+   <div class="acts"><button class="btn" id="go">Get started</button><button class="btn alt" id="lg">I have an account</button></div>
+  </div>
+  <div class="cluster" aria-hidden="true">
+   <svg viewBox="0 0 100 100" style="--w:32%;--x:34%;--y:2%;--r:-6deg;--i:3"><use href="#apple"/></svg>
+   <svg viewBox="0 0 100 100" style="--w:30%;--x:3%;--y:10%;--r:-12deg;--i:2"><use href="#orange"/></svg>
+   <svg viewBox="0 0 100 100" style="--w:30%;--x:67%;--y:8%;--r:10deg;--i:4"><use href="#grapes"/></svg>
+   <svg viewBox="0 0 100 100" style="--w:28%;--x:2%;--y:40%;--r:-8deg;--i:5"><use href="#pear"/></svg>
+   <svg viewBox="0 0 100 100" style="--w:30%;--x:69%;--y:38%;--r:12deg;--i:6"><use href="#berry"/></svg>
+   <svg viewBox="0 0 100 100" style="--w:46%;--x:27%;--y:30%;--r:-3deg;--i:1"><use href="#melon"/></svg>
+   <svg viewBox="0 0 100 100" style="--w:28%;--x:5%;--y:68%;--r:6deg;--i:7"><use href="#cherry"/></svg>
+   <svg viewBox="0 0 100 100" style="--w:30%;--x:66%;--y:66%;--r:-14deg;--i:8"><use href="#banana"/></svg>
+  </div>
+ </div>
+</main>
+
+<!-- VIEW 4: ACCOUNT -->
+<main class="view" id="v4">
+ <div class="wrap"><div class="form">
+  <button class="back" id="b4">&larr; Back</button>
+  <h2 id="at">Create your account</h2>
+  <p class="lead" style="margin-bottom:0" id="as">Pick a unique ID and a password. You stay logged in on this device, so you don’t have to sign in every time.</p>
+  <div class="card">
+   <div class="seg" id="am" role="group" aria-label="Account mode"><button type="button" aria-pressed="true" data-v="new">Create account</button><button type="button" aria-pressed="false" data-v="old">Log in</button></div>
+   <div style="height:18px"></div>
+   <label class="f"><span class="lh">Your ID <small>letters, numbers, _</small></span><input id="uid" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="20" placeholder="e.g. abhishek_k"></label>
+   <label class="f"><span class="lh">Password <small>at least 6 characters</small></span><input id="pw" type="password" autocomplete="new-password" placeholder="Password"></label>
+   <label class="f" id="cf"><span class="lh">Confirm password</span><input id="pw2" type="password" autocomplete="new-password" placeholder="Type it again"></label>
+   <button class="btn" id="sb" style="width:100%">Create account</button>
+   <div class="or"><span>or</span></div>
+   <button class="btn alt" id="gg" style="width:100%"><svg width="22" height="22" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.600 20.100H42V20H24v8h11.300A12 12 0 1 1 24 12c3.100 0 5.800 1.100 8 3l5.700-5.700A20 20 0 1 0 44 24c0-1.300-.1-2.600-.4-3.900z"/><path fill="#FF3D00" d="M6.300 14.700l6.600 4.800A12 12 0 0 1 24 12c3.100 0 5.800 1.100 8 3l5.700-5.700A20 20 0 0 0 6.300 14.700z"/><path fill="#4CAF50" d="M24 44c5.200 0 9.900-2 13.400-5.200l-6.200-5.200A12 12 0 0 1 12.700 28l-6.500 5C9.500 39.600 16.200 44 24 44z"/><path fill="#1976D2" d="M43.600 20.100H42V20H24v8h11.300a12 12 0 0 1-4.100 5.600l6.200 5.200C37 39.200 44 34 44 24c0-1.300-.1-2.600-.4-3.900z"/></svg>Continue with Google</button>
+   <p class="err" id="er" role="alert"></p>
+   <div class="warn"><svg viewBox="0 0 28 28" aria-hidden="true"><path d="M14 3L2 25h24z" fill="#F59E0B" stroke="#F59E0B" stroke-width="2" stroke-linejoin="round"/><path d="M14 11v7" stroke="#1E2A22" stroke-width="2.500" stroke-linecap="round"/><circle cx="14" cy="21.500" r="1.500" fill="#1E2A22"/></svg><span id="wn"></span></div>
+  </div>
+ </div></div>
+</main>
+
+<!-- VIEW 2: PROFILE -->
+<main class="view" id="v2">
+ <div class="wrap">
+  <div class="form">
+   <button class="back" id="bk">&larr; Back</button>
+   <h2>Tell us about you</h2>
+   <p class="lead" style="margin-bottom:0">Only name, age, gender, height and weight are needed. We’ll work out your BMI as you type.</p>
+
+   <div class="card">
+    <h3><svg viewBox="0 0 40 40" aria-hidden="true"><use href="#apple"/></svg>Your basics</h3>
+    <label class="f"><span class="lh">Name</span><input id="nm" autocomplete="given-name" placeholder="What should we call you?"></label>
+    <div class="row">
+     <label class="f"><span class="lh">Age</span><input id="ag" type="number" inputmode="numeric" min="1" max="120" placeholder="Years"></label>
+     <div class="f"><span class="lh">Gender</span>
+      <div class="seg" id="gd" role="group" aria-label="Gender"><button type="button" aria-pressed="false" data-v="Female">Female</button><button type="button" aria-pressed="false" data-v="Male">Male</button><button type="button" aria-pressed="false" data-v="Other">Other</button></div>
+     </div>
+    </div>
+    <div class="row">
+     <div class="f"><div class="lh"><label for="h">Height</label><div class="seg" data-u="h"><button type="button" aria-pressed="true" data-v="cm">cm</button><button type="button" aria-pressed="false" data-v="in">inches</button></div></div><input id="h" type="number" inputmode="decimal" placeholder="e.g. 170"></div>
+     <div class="f"><div class="lh"><label for="w">Body weight</label><div class="seg" data-u="w"><button type="button" aria-pressed="true" data-v="kg">kg</button><button type="button" aria-pressed="false" data-v="lb">lb</button></div></div><input id="w" type="number" inputmode="decimal" placeholder="e.g. 65"></div>
+    </div>
+    <div class="bmi" aria-live="polite">
+     <div class="top"><span class="num" id="bn">–</span><span class="chip" id="bc">Your BMI shows here</span></div>
+     <div class="gw"><div class="g"><i style="width:23%;background:#3B82F6"></i><i style="width:23%;background:#2E9E4F"></i><i style="width:18%;background:#F59E0B"></i><i style="width:36%;background:#E5383B"></i></div><div class="pin" id="pin"></div></div>
+     <div class="gl"><span style="width:23%">Under</span><span style="width:23%">Healthy</span><span style="width:18%">Over</span><span style="width:36%">Obese</span></div>
+     <p class="hint" id="bh">Enter your height and weight to see your BMI and category.</p>
+    </div>
+   </div>
+
+   <div class="card">
+    <h3><svg viewBox="0 0 40 40" aria-hidden="true"><rect x="3" y="14" width="34" height="14" rx="7" transform="rotate(-35 20 21)" fill="#FF4F6D"/><path d="M12 11l17 20" stroke="#fff" stroke-width="2"/></svg>Health details <span class="opt">(optional)</span></h3>
+    <label class="f"><span class="lh">Any medical condition?</span><textarea id="mc" placeholder="Leave blank to skip"></textarea></label>
+    <label class="f" style="margin-bottom:0"><span class="lh">What medicine do you take?</span><input id="md" placeholder="Leave blank to skip"></label>
+   </div>
+
+   <div class="card"><button class="btn" id="sv" style="width:100%">Save my profile</button><p class="err" id="e2" role="alert"></p></div>
+  </div>
+ </div>
+</main>
+
+<!-- VIEW 3: DONE -->
+<main class="view" id="v3">
+ <div class="wrap"><div class="done">
+  <svg class="big" viewBox="0 0 100 100" aria-hidden="true"><use href="#apple"/></svg>
+  <h2 id="dn">You’re all set</h2>
+  <p class="lead" id="ds"></p>
+  <div class="acts" style="justify-content:center"><button class="btn alt" id="ed">Edit my details</button><button class="btn alt" id="lo">Log out</button></div>
+ </div></div>
+</main>
+<div id="t" role="status"></div>
+
+<script>
+(function(){
+var $=function(s){return document.querySelector(s)},V=['v1','v2','v3','v4'];
+/* Cloud mode: paste your Firebase web config below (works only when this file is hosted on your own site).
+   Example: {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."} */
+var FIREBASE_CONFIG={
+  apiKey:"AIzaSyDFspjVAIpsXpmYXhiDGiFZGxCpt-giyuk",
+  authDomain:"health-is-wealth-b4dfc.firebaseapp.com",
+  projectId:"health-is-wealth-b4dfc",
+  storageBucket:"health-is-wealth-b4dfc.firebasestorage.app",
+  messagingSenderId:"363135219448",
+  appId:"1:363135219448:web:42187af123f987ff5b6d0d"
+};
+var S={g:'',h:'cm',w:'kg'},bmi=null,cat='',mode='new',cur=null;
+function show(n){V.forEach(function(v){$('#'+v).classList.toggle('on',v===n)});window.scrollTo(0,0)}
+function toast(m){var t=$('#t');t.textContent=m;t.classList.add('on');clearTimeout(toast.i);toast.i=setTimeout(function(){t.classList.remove('on')},3200)}
+function press(box,v){box.querySelectorAll('button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.v===v)})}
+function msg(e){return typeof e==='string'?e:'Something went wrong. Please try again.'}
+
+/* ---------- local (this device) backend ---------- */
+var LS={get:function(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set:function(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}};
+function b64(b){return btoa(String.fromCharCode.apply(null,new Uint8Array(b)))}
+function hash(pw,salt){
+ if(!(window.crypto&&crypto.subtle))return Promise.reject('This browser can’t protect passwords here. Open the page over https.');
+ return crypto.subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveBits']).then(function(k){
+  return crypto.subtle.deriveBits({name:'PBKDF2',salt:salt,iterations:150000,hash:'SHA-256'},k,256)}).then(b64)}
+var local={
+ signup:function(id,pw){var a=LS.get('ct.accounts',{});if(a[id])return Promise.reject('That ID is already taken. Try another.');
+  var salt=crypto.getRandomValues(new Uint8Array(16));
+  return hash(pw,salt).then(function(x){a[id]={salt:b64(salt),hash:x};if(!LS.set('ct.accounts',a))throw'This browser blocked saving. Turn off private mode and try again.';LS.set('ct.session',id);return{id:id}})},
+ login:function(id,pw){var r=LS.get('ct.accounts',{})[id];if(!r)return Promise.reject('No account with that ID on this device.');
+  var salt=Uint8Array.from(atob(r.salt),function(c){return c.charCodeAt(0)});
+  return hash(pw,salt).then(function(x){if(x!==r.hash)throw'Wrong password.';LS.set('ct.session',id);return{id:id,profile:r.profile}})},
+ google:function(){return Promise.reject('Google sign-in needs Firebase. Add your Firebase config first.')},
+ save:function(u,p){var a=LS.get('ct.accounts',{});a[u.id].profile=p;return LS.set('ct.accounts',a)?Promise.resolve():Promise.reject('Saving failed. Your browser may be blocking storage.')},
+ restore:function(){var id=LS.get('ct.session',null),a=LS.get('ct.accounts',{});return Promise.resolve(id&&a[id]?{id:id,profile:a[id].profile}:null)},
+ out:function(){LS.set('ct.session',null);return Promise.resolve()}
+};
+
+/* ---------- cloud (Firebase) backend ---------- */
+var fbp=null;
+function fbLoad(){if(fbp)return fbp;var u='https://www.gstatic.com/firebasejs/10.12.2/';
+ fbp=Promise.all([import(u+'firebase-app.js'),import(u+'firebase-auth.js'),import(u+'firebase-firestore.js')]).then(function(m){
+  var app=m[0].initializeApp(FIREBASE_CONFIG);return{a:m[1],f:m[2],auth:m[1].getAuth(app),db:m[2].getFirestore(app)}});return fbp}
+var DOM='@calorietracker.app';
+function fbErr(e){var c=(e&&e.code)||'';
+ return c==='auth/email-already-in-use'?'That ID is already taken. Try another.':
+ (c==='auth/invalid-credential'||c==='auth/wrong-password'||c==='auth/user-not-found')?'ID or password is wrong.':
+ c==='auth/weak-password'?'Use at least 6 characters.':c==='auth/popup-closed-by-user'?'Google sign-in was closed.':
+ 'Cloud sign-in failed. Check your Firebase setup and connection.'}
+function loadP(x,uid){return x.f.getDoc(x.f.doc(x.db,'users',uid)).then(function(s){return s.exists()?s.data():null})}
+function who(u){return u.email&&u.email.slice(-DOM.length)===DOM?u.email.slice(0,-DOM.length):(u.displayName||'friend')}
+var cloud={
+ signup:function(id,pw){return fbLoad().then(function(x){return x.a.createUserWithEmailAndPassword(x.auth,id+DOM,pw).then(function(c){return{id:id,uid:c.user.uid}})}).catch(function(e){throw fbErr(e)})},
+ login:function(id,pw){return fbLoad().then(function(x){return x.a.signInWithEmailAndPassword(x.auth,id+DOM,pw).then(function(c){return loadP(x,c.user.uid).then(function(p){return{id:id,uid:c.user.uid,profile:p}})})}).catch(function(e){throw fbErr(e)})},
+ google:function(){return fbLoad().then(function(x){return x.a.signInWithPopup(x.auth,new x.a.GoogleAuthProvider()).then(function(c){return loadP(x,c.user.uid).then(function(p){return{id:who(c.user),uid:c.user.uid,profile:p}})})}).catch(function(e){throw fbErr(e)})},
+ save:function(u,p){return fbLoad().then(function(x){return x.f.setDoc(x.f.doc(x.db,'users',u.uid),p)}).catch(function(){throw'Saving to the cloud failed. Check your connection and Firestore rules.'})},
+ restore:function(){return fbLoad().then(function(x){return new Promise(function(res){var off=x.a.onAuthStateChanged(x.auth,function(u){off();if(!u)return res(null);loadP(x,u.uid).then(function(p){res({id:who(u),uid:u.uid,profile:p})}).catch(function(){res(null)})})})}).catch(function(){return null})},
+ out:function(){return fbLoad().then(function(x){return x.a.signOut(x.auth)}).catch(function(){})}
+};
+var B=FIREBASE_CONFIG?cloud:local;
+$('#wn').textContent=FIREBASE_CONFIG?'Your account and data are stored securely in the cloud, so they survive a device reset. Your ID is unique across everyone.':'Accounts are saved on this device only. If your device or browser data is erased, they are deleted for good and can’t be recovered, so export your data before any reset. IDs are unique on this device.';
+
+/* ---------- account flow ---------- */
+function setMode(m){mode=m;press($('#am'),m);var n=m==='new';
+ $('#cf').style.display=n?'':'none';$('#sb').textContent=n?'Create account':'Log in';
+ $('#at').textContent=n?'Create your account':'Welcome back';
+ $('#as').textContent=n?'Pick a unique ID and a password. You stay logged in on this device, so you don’t have to sign in every time.':'Log in with your ID and password.';
+ $('#pw').autocomplete=n?'new-password':'current-password';$('#er').textContent=''}
+function busy(on){$('#sb').disabled=$('#gg').disabled=on}
+function fail(e){busy(false);$('#er').textContent=msg(e)}
+function enter(u){busy(false);cur=u;if(u.profile)home();else show('v2')}
+function home(){var p=cur.profile;$('#dn').textContent='Welcome, '+p.name;
+ $('#ds').textContent='Your BMI is '+p.bmi.toFixed(1)+' ('+p.category.toLowerCase()+'). Your details are saved. Your food diary comes next.';show('v3')}
+$('#go').onclick=function(){setMode('new');show('v4')};
+$('#lg').onclick=function(){setMode('old');show('v4')};
+$('#b4').onclick=function(){show('v1')};
+$('#am').onclick=function(e){var b=e.target.closest('button');if(b)setMode(b.dataset.v)};
+$('#sb').onclick=function(){
+ var id=$('#uid').value.trim().toLowerCase(),pw=$('#pw').value,e=$('#er');e.textContent='';
+ if(!/^[a-z0-9_]{3,20}$/.test(id)){e.textContent='ID must be 3 to 20 letters, numbers or underscores.';return}
+ if(pw.length<6){e.textContent='Password needs at least 6 characters.';return}
+ if(mode==='new'&&pw!==$('#pw2').value){e.textContent='Passwords don’t match.';return}
+ busy(true);(mode==='new'?B.signup(id,pw):B.login(id,pw)).then(enter).catch(fail)};
+$('#gg').onclick=function(){$('#er').textContent='';busy(true);B.google().then(enter).catch(fail)};
+$('#lo').onclick=function(){B.out().then(function(){cur=null;['uid','pw','pw2'].forEach(function(i){$('#'+i).value=''});setMode('old');show('v1')})};
+$('#bk').onclick=function(){cur&&cur.profile?home():show('v1')};
+$('#ed').onclick=function(){var p=cur.profile;if(p){$('#nm').value=p.name;$('#ag').value=p.age;S.g=p.gender;press($('#gd'),p.gender);S.h='cm';S.w='kg';
+ document.querySelectorAll('.seg[data-u]').forEach(function(b){press(b,S[b.dataset.u])});
+ $('#h').value=p.height_cm;$('#w').value=p.weight_kg;$('#mc').value=p.condition||'';$('#md').value=p.medicine||'';calc()}show('v2')};
+
+/* ---------- profile + BMI ---------- */
+$('#gd').onclick=function(e){var b=e.target.closest('button');if(b){S.g=b.dataset.v;press(this,S.g)}};
+document.querySelectorAll('.seg[data-u]').forEach(function(box){box.onclick=function(e){
+ var b=e.target.closest('button');if(!b)return;var k=box.dataset.u,n=b.dataset.v,o=S[k];if(n===o)return;
+ var inp=$('#'+k),x=parseFloat(inp.value);
+ if(x){var f=k==='h'?(n==='in'?1/2.54:2.54):(n==='lb'?2.20462:1/2.20462);inp.value=Math.round(x*f*10)/10}
+ S[k]=n;press(box,n);inp.placeholder='e.g. '+(k==='h'?(n==='cm'?'170':'67'):(n==='kg'?'65':'143'));calc()}});
+function calc(){
+ var h=parseFloat($('#h').value),w=parseFloat($('#w').value),age=parseFloat($('#ag').value);
+ if(S.h==='in')h*=2.54;if(S.w==='lb')w/=2.20462;
+ var c=$('#bc'),p=$('#pin');
+ if(!(h>50&&h<272&&w>10&&w<500)){bmi=null;cat='';$('#bn').textContent='–';c.textContent='Your BMI shows here';c.style.setProperty('--c','var(--mu)');p.style.opacity=0;$('#bh').textContent='Enter your height and weight to see your BMI and category.';return}
+ bmi=w/Math.pow(h/100,2);
+ var k=bmi<18.5?['Underweight','#3B82F6']:bmi<25?['Healthy weight','#2E9E4F']:bmi<30?['Overweight','#F59E0B']:['Obese','#E5383B'];
+ cat=k[0];$('#bn').textContent=bmi.toFixed(1);c.textContent=cat;c.style.setProperty('--c',k[1]);
+ p.style.opacity=1;p.style.left=Math.max(0,Math.min(100,(bmi-12)/28*100))+'%';
+ $('#bh').textContent=age&&age<18?'For under-18s, BMI is read against growth charts, so treat this category as a rough guide.':'BMI is a general guide. It doesn’t see muscle, bone or body shape.'}
+['h','w','ag'].forEach(function(i){$('#'+i).addEventListener('input',calc)});
+function data(){
+ var nm=$('#nm').value.trim(),ag=parseFloat($('#ag').value),h=parseFloat($('#h').value),w=parseFloat($('#w').value);
+ if(!nm)return'Add your name.';if(!(ag>=1&&ag<=120))return'Enter an age between 1 and 120.';if(!S.g)return'Choose a gender.';
+ if(bmi===null)return'Enter a realistic height and weight.';
+ return{name:nm,age:ag,gender:S.g,height_cm:Math.round((S.h==='in'?h*2.54:h)*10)/10,weight_kg:Math.round((S.w==='lb'?w/2.20462:w)*10)/10,bmi:Math.round(bmi*10)/10,category:cat,condition:$('#mc').value.trim(),medicine:$('#md').value.trim(),created:(cur&&cur.profile&&cur.profile.created)||Date.now(),updated:Date.now()}}
+$('#sv').onclick=function(){var d=data(),e=$('#e2');if(typeof d==='string'){e.textContent=d;return}e.textContent='';
+ B.save(cur,d).then(function(){cur.profile=d;home()}).catch(function(x){e.textContent=msg(x)})};
+
+setMode('new');
+B.restore().then(function(u){if(u){cur=u;u.profile?home():show('v2')}}).catch(function(){});
+})();
+</script>
+</body>
+</html>
