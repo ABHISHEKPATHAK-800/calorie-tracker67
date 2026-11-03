@@ -250,6 +250,8 @@ video,.pv{display:block;width:100%;max-height:340px;border-radius:16px;backgroun
 #sm .btn{padding:11px 20px;font-size:.98rem}
 #sm .ks{font-size:.9rem;font-weight:600;margin:10px 0 0}
 #sm .ks.ok{color:#2E9E4F}
+#stf{position:fixed;z-index:15;top:calc(12px + env(safe-area-inset-top,0px));right:12px;width:42px;height:42px;border-radius:50%;border:1.5px solid var(--ink);background:var(--sf);color:var(--ink);display:grid;place-items:center;cursor:pointer;padding:0;box-shadow:0 6px 16px -6px rgba(0,0,0,.35)}
+body:has(#v3.on) #stf,body:has(#vs.on) #stf{display:none}
 </style>
 </head>
 <body>
@@ -455,6 +457,7 @@ video,.pv{display:block;width:100%;max-height:340px;border-radius:16px;backgroun
 
 <main class="view" id="vs"><div class="wrap"><div class="done"><h2>Send a photo</h2><p class="lead" id="sst">Take a photo of your food. It goes straight to your computer.</p>
  <label class="btn" for="sp">Take photo</label><input id="sp" type="file" accept="image/*" capture="environment" hidden></div></div></main>
+<button id="stf" type="button" aria-label="Settings: API key"><svg class="ic"><use href="#i-gear"/></svg></button>
 <div id="sm" role="dialog" aria-modal="true" aria-labelledby="smt"><div class="box">
  <h3 id="smt">Settings</h3>
  <p class="hint" style="margin:0">Paste your Groq API key (starts with <b>gsk_</b>). It powers the AI coach and food scanning. Get one free at console.groq.com. The key is saved only in this browser.</p>
@@ -737,7 +740,7 @@ let GROQ_KEY=LS.get('ct.groqkey','')||'';/* saved from the gear icon in the app 
  function note(){st.className='ks'+(GROQ_KEY?' ok':'');st.textContent=GROQ_KEY?'Key saved ('+mask(GROQ_KEY)+')':'No key saved yet.'}
  function open(){inp.value='';inp.type='password';note();sm.classList.add('on');setTimeout(()=>inp.focus(),30)}
  function close(){sm.classList.remove('on')}
- $('#st').onclick=open;$('#smc').onclick=close;
+ $('#st').onclick=open;$('#stf').onclick=open;$('#smc').onclick=close;
  sm.onclick=e=>{if(e.target===sm)close()};
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&sm.classList.contains('on'))close()});
  $('#smv').onclick=()=>{inp.type=inp.type==='password'?'text':'password'};
