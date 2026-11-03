@@ -252,6 +252,9 @@ video,.pv{display:block;width:100%;max-height:340px;border-radius:16px;backgroun
 #sm .ks.ok{color:#2E9E4F}
 #stf{position:fixed;z-index:15;top:calc(12px + env(safe-area-inset-top,0px));right:12px;width:42px;height:42px;border-radius:50%;border:1.5px solid var(--ink);background:var(--sf);color:var(--ink);display:grid;place-items:center;cursor:pointer;padding:0;box-shadow:0 6px 16px -6px rgba(0,0,0,.35)}
 body:has(#v3.on) #stf,body:has(#vs.on) #stf{display:none}
+.dg{flex:none;border:0;background:none;color:var(--mu);font:700 1.2rem/1 Figtree,sans-serif;letter-spacing:-.15em;padding:10px 8px;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;border-radius:10px}
+.dg:active{cursor:grabbing}.dg:focus-visible{outline:3px solid var(--ink);outline-offset:1px}
+#mm li.dragging{background:var(--tint,var(--bg));border-radius:16px;box-shadow:0 10px 24px -10px rgba(0,0,0,.45);position:relative;z-index:2}
 </style>
 </head>
 <body>
@@ -440,7 +443,7 @@ body:has(#v3.on) #stf,body:has(#vs.on) #stf{display:none}
    <p class="hint">It reads your meals and history. It sees your medicines only if you allow it in the Meds tab. It is not a doctor.</p></div></section>
 
   <section class="pn" id="p-med">
-   <div class="card"><h3>My medicines</h3><p class="hint" id="mcond" style="margin:0 0 10px"></p><ul class="ml" id="mm"></ul>
+   <div class="card"><h3>My medicines</h3><p class="hint" id="mcond" style="margin:0 0 10px"></p><ul class="ml" id="mm"></ul><p class="hint" id="mdh" style="margin:8px 0 0">Drag the ⋮⋮ handle to change the order.</p>
     <div class="rmc"><button class="btn alt sm" id="rmb" type="button">Turn on alerts</button><label class="chk" style="margin:12px 0 0"><input type="checkbox" id="mai"><span>Let the AI coach see my medicines, doses and times</span></label><p class="hint" id="rmh" style="margin:6px 0 0"></p></div>
 <div class="mf" id="mf"><h4 id="mft">Add a medicine</h4>
 <label class="f"><span class="lh">Medicine name</span><input id="mnn" placeholder="e.g. Metformin" maxlength="60"></label>
@@ -695,7 +698,7 @@ function rMed(){const p=cur.profile,k=kd(),td=dayOf(k).meds||[],L=meds0(),now=Da
  $('#mcond').textContent=p.condition?'Condition you shared: '+p.condition:'';$('#mai').checked=!!p.health_consent;rmh();
  $('#mm').innerHTML=L.length?L.map((m,i)=>{const on=active(m,k),n=dayN(m,k)+1,per=!m.days?'Ongoing':n>m.days?'Course finished':n<1?'Starts '+nice(m.start):'Day '+n+' of '+m.days,mine=td.filter(x=>x.name===m.name),
   dos=(m.times||[]).length?m.times.map(s=>{const t=mine.find(x=>x.slot===s),a=at(k,s),st=t?'ok':now<a?'':now-a>36e5?'miss':'due';return `<button class="dose ${st}" data-took="${i}" data-slot="${s}"${t||!on?' disabled':''}>${s}${t?' ✓ '+hm(t.t):st==='miss'?' · missed':st==='due'?' · due':''}</button>`}).join(''):`<button class="dose" data-took="${i}" data-slot=""${on?'':' disabled'}>Took it${mine.length?' ('+mine.length+' today)':''}</button>`;
-  return `<li><div class="nm"><b>${esc(m.name)}</b>${m.dose?' <span class="opt">'+esc(m.dose)+'</span>':''}<small>${esc([m.food,per,m.notes].filter(Boolean).join(' · '))}</small><div class="doses">${dos}</div></div><button class="x2" data-edm="${i}" aria-label="Edit">✎</button><button class="x2" data-rm="${i}" aria-label="Remove">×</button></li>`}).join(''):'<li class="hint">No medicines added yet. Add one below.</li>';
+  return `<li data-i="${i}"><button class="dg" type="button" aria-label="Drag to reorder ${esc(m.name)}. Or press arrow up or down.">⋮⋮</button><div class="nm"><b>${esc(m.name)}</b>${m.dose?' <span class="opt">'+esc(m.dose)+'</span>':''}<small>${esc([m.food,per,m.notes].filter(Boolean).join(' · '))}</small><div class="doses">${dos}</div></div><button class="x2" data-edm="${i}" aria-label="Edit">✎</button><button class="x2" data-rm="${i}" aria-label="Remove">×</button></li>`}).join(''):'<li class="hint">No medicines added yet. Add one below.</li>';
  const ks=Object.keys(days).filter(k=>(days[k].meds||[]).length).sort().reverse().slice(0,7);
  $('#mh').innerHTML=ks.length?ks.map(k=>`<p style="margin:0 0 6px"><b>${nice(k)}</b>: ${days[k].meds.map(m=>esc(m.name)+(m.slot?' '+m.slot:'')+' ('+hm(m.t)+')').join(', ')}</p>`).join(''):'<p class="hint">Tap a dose when you take it and it shows here.</p>'}
 function rmh(){const g='Notification'in window&&Notification.permission==='granted';$('#rmb').textContent=g?'Alerts are on':'Turn on alerts';$('#rmh').textContent='Reminders ring while this page is open, even in a background tab. If the page is closed, your phone cannot alert you.'}
@@ -726,6 +729,18 @@ $('#mm').onclick=e=>{const t=e.target.closest('[data-took]'),r=e.target.closest(
  if(t)logDose(L[+t.dataset.took],t.dataset.slot);
  if(r){L.splice(+r.dataset.rm,1);cur.profile.medicines=L;saveP();rMed()}
  if(ed)fillMed(L[+ed.dataset.edm],+ed.dataset.edm)};
+/* drag to reorder medicines */
+(function(){const ul=$('#mm');let dr=null;
+ const commit=(NL,L)=>{const ed=medEdit>=0?L[medEdit]:null;cur.profile.medicines=NL;if(ed)medEdit=NL.indexOf(ed);saveP();rMed()};
+ ul.addEventListener('pointerdown',e=>{const h=e.target.closest('.dg');if(!h)return;e.preventDefault();dr=h.closest('li');dr.classList.add('dragging');try{h.setPointerCapture(e.pointerId)}catch(_){}});
+ ul.addEventListener('pointermove',e=>{if(!dr)return;for(const o of ul.querySelectorAll('li[data-i]')){if(o===dr)continue;const r=o.getBoundingClientRect();if(e.clientY>r.top&&e.clientY<r.bottom){ul.insertBefore(dr,e.clientY<r.top+r.height/2?o:o.nextSibling);break}}});
+ const end=()=>{if(!dr)return;dr.classList.remove('dragging');dr=null;const L=meds0(),order=[...ul.querySelectorAll('li[data-i]')].map(l=>+l.dataset.i);
+  if(order.every((v,i)=>v===i)){return}commit(order.map(i=>L[i]),L);toast('Order saved')};
+ ul.addEventListener('pointerup',end);ul.addEventListener('pointercancel',end);
+ ul.addEventListener('keydown',e=>{const h=e.target.closest('.dg');if(!h||(e.key!=='ArrowUp'&&e.key!=='ArrowDown'))return;e.preventDefault();
+  const i=+h.closest('li').dataset.i,j=i+(e.key==='ArrowUp'?-1:1),L=meds0();if(j<0||j>=L.length)return;const NL=L.slice();[NL[i],NL[j]]=[NL[j],NL[i]];commit(NL,L);
+  const nh=ul.querySelector('li[data-i="'+j+'"] .dg');if(nh)nh.focus()});
+})();
 /* Gemini through Firebase AI Logic (no API key in this file) */
 const ESTSYS='You are a careful nutrition estimator. Use realistic home portions.';
 function aiErr(e){console.error('AI error:',e);const m=String(e&&e.message||e),d=' Details: '+m.slice(0,170);
