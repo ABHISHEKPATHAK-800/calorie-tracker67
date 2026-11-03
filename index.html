@@ -239,6 +239,17 @@ video,.pv{display:block;width:100%;max-height:340px;border-radius:16px;backgroun
 #sr .ml li.dr{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;border:1.5px solid var(--ln);border-radius:18px;padding:12px;background:var(--bg)}
 .dr .dn{grid-column:1}.dr .dq{grid-column:1;display:grid;grid-template-columns:1fr 112px;gap:8px}.dr .x2{grid-column:2;grid-row:1}.dr .st2{grid-column:1/-1;color:var(--mu);font-size:.82rem}
 .dr input,.dr select{padding:10px 12px;font-size:16px}
+/* settings dialog */
+#sm{position:fixed;inset:0;z-index:20;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.5)}
+#sm.on{display:flex}
+#sm .box{width:min(440px,100%);max-height:100%;overflow:auto;background:var(--sf);color:var(--ink);border:1.5px solid var(--ln);border-radius:28px;padding:24px;box-shadow:0 24px 60px -16px rgba(0,0,0,.5)}
+#sm h3{font:800 1.3rem "Bricolage Grotesque",Figtree,sans-serif;margin:0 0 6px;letter-spacing:-.02em}
+#sm .kr{display:flex;gap:8px;align-items:center;margin-top:12px}
+#sm .kr input{flex:1;min-width:0}
+#sm .acts{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+#sm .btn{padding:11px 20px;font-size:.98rem}
+#sm .ks{font-size:.9rem;font-weight:600;margin:10px 0 0}
+#sm .ks.ok{color:#2E9E4F}
 </style>
 </head>
 <body>
@@ -264,6 +275,8 @@ video,.pv{display:block;width:100%;max-height:340px;border-radius:16px;backgroun
 <symbol id="i-bowl" viewBox="0 0 24 24"><path d="M3 11h18a9 8 0 0 1-18 0zM8 7c0-2 2-2 2-4M13 7c0-2 2-2 2-4"/></symbol>
 <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.500" y="5" width="17" height="15" rx="3"/><path d="M3.500 10h17M8 3v4M16 3v4"/></symbol>
 <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20l1-4L16.500 4.500a2.100 2.100 0 0 1 3 3L8 19z"/></symbol>
+<symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></symbol>
+<symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
 <symbol id="i-out" viewBox="0 0 24 24"><path d="M10 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4M15 8l4 4-4 4M19 12H9"/></symbol>
 </defs></svg>
 
@@ -381,6 +394,7 @@ video,.pv{display:block;width:100%;max-height:340px;border-radius:16px;backgroun
  <div class="hd-t"><svg class="mk" viewBox="0 0 100 100" aria-hidden="true"><use href="#apple"/></svg><div><h2 id="dn"></h2><p class="hint" id="ds" style="margin:4px 0 0"></p></div></div>
  <div class="hd-a">
   <button class="ib" id="tg" type="button" aria-label="Switch light or dark mode"><svg class="ic sun"><use href="#i-sun"/></svg><svg class="ic moon"><use href="#i-moon"/></svg></button>
+  <button class="ib" id="st" type="button" aria-label="Settings: API key"><svg class="ic"><use href="#i-gear"/></svg></button>
   <button class="ib" id="ed" aria-label="Edit details"><svg class="ic"><use href="#i-edit"/></svg></button><button class="ib" id="lo" aria-label="Log out"><svg class="ic"><use href="#i-out"/></svg></button>
  </div>
 </header>
@@ -441,6 +455,13 @@ video,.pv{display:block;width:100%;max-height:340px;border-radius:16px;backgroun
 
 <main class="view" id="vs"><div class="wrap"><div class="done"><h2>Send a photo</h2><p class="lead" id="sst">Take a photo of your food. It goes straight to your computer.</p>
  <label class="btn" for="sp">Take photo</label><input id="sp" type="file" accept="image/*" capture="environment" hidden></div></div></main>
+<div id="sm" role="dialog" aria-modal="true" aria-labelledby="smt"><div class="box">
+ <h3 id="smt">Settings</h3>
+ <p class="hint" style="margin:0">Paste your Groq API key (starts with <b>gsk_</b>). It powers the AI coach and food scanning. Get one free at console.groq.com. The key is saved only in this browser.</p>
+ <div class="kr"><input id="smk" type="password" autocomplete="off" spellcheck="false" placeholder="gsk_..." aria-label="Groq API key"><button class="ib" id="smv" type="button" aria-label="Show or hide key"><svg class="ic"><use href="#i-eye"/></svg></button></div>
+ <p class="ks" id="sms" aria-live="polite"></p>
+ <div class="acts"><button class="btn" id="smsv" type="button">Save key</button><button class="btn alt" id="smrm" type="button">Remove</button><button class="btn alt" id="smc" type="button">Close</button></div>
+</div></div>
 <div id="remw" aria-live="assertive"></div>
 <div id="t" role="status"></div>
 
@@ -706,13 +727,29 @@ $('#mm').onclick=e=>{const t=e.target.closest('[data-took]'),r=e.target.closest(
 const ESTSYS='You are a careful nutrition estimator. Use realistic home portions.';
 function aiErr(e){console.error('AI error:',e);const m=String(e&&e.message||e),d=' Details: '+m.slice(0,170);
  return/429|rate.?limit/i.test(m)?'Free limit reached for now. Try again in a minute.'+d:
- /401|403|invalid.*key|api key/i.test(m)?'Groq rejected the key. Check GROQ_KEY in this file.'+d:
+ /401|403|invalid.*key|api key/i.test(m)?'Groq rejected the key. Open the gear icon at the top and check it.'+d:
  /404|model/i.test(m)?'Groq could not find that model.'+d:
  /Failed to fetch|NetworkError|Load failed/i.test(m)?'Could not reach Groq. Check your internet.'+d:
  'The AI could not answer.'+d}
-const GROQ_KEY="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";/* keep this private; revoke it at console.groq.com when you publish */
+let GROQ_KEY=LS.get('ct.groqkey','')||'';/* saved from the gear icon in the app header */
+(function(){const sm=$('#sm'),inp=$('#smk'),st=$('#sms');
+ const mask=k=>k?k.slice(0,4)+'…'+k.slice(-4):'';
+ function note(){st.className='ks'+(GROQ_KEY?' ok':'');st.textContent=GROQ_KEY?'Key saved ('+mask(GROQ_KEY)+')':'No key saved yet.'}
+ function open(){inp.value='';inp.type='password';note();sm.classList.add('on');setTimeout(()=>inp.focus(),30)}
+ function close(){sm.classList.remove('on')}
+ $('#st').onclick=open;$('#smc').onclick=close;
+ sm.onclick=e=>{if(e.target===sm)close()};
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&sm.classList.contains('on'))close()});
+ $('#smv').onclick=()=>{inp.type=inp.type==='password'?'text':'password'};
+ const save=()=>{const k=inp.value.trim();if(!k){st.className='ks';st.textContent='Paste a key first.';inp.focus();return}
+  if(/\s/.test(k)){st.className='ks';st.textContent='A key has no spaces. Check what you pasted.';return}
+  if(!LS.set('ct.groqkey',k)){st.className='ks';st.textContent='Could not save in this browser.';return}
+  GROQ_KEY=k;close();toast('API key saved')};
+ $('#smsv').onclick=save;inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();save()}};
+ $('#smrm').onclick=()=>{try{localStorage.removeItem('ct.groqkey')}catch(_){}GROQ_KEY='';note();inp.value='';toast('API key removed')};
+})();
 const GROQ_MODELS=['qwen/qwen3.8-27b','qwen/qwen3.6-27b'];/* Groq vision models, tried in order */
-function gem(sys,parts,json){if(!GROQ_KEY)return Promise.reject('Add your Groq key (GROQ_KEY) in this file first.');
+function gem(sys,parts,json){if(!GROQ_KEY)return Promise.reject('Add your Groq API key with the gear icon at the top first.');
  const arr=Array.isArray(parts)?parts:[parts],content=arr.map(x=>typeof x==='string'?{type:'text',text:x}:{type:'image_url',image_url:{url:'data:'+x.inlineData.mimeType+';base64,'+x.inlineData.data}}),
  go=(i,fast)=>fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+GROQ_KEY},body:JSON.stringify(Object.assign({model:GROQ_MODELS[i],messages:[{role:'system',content:sys},{role:'user',content}],temperature:.4,max_tokens:2048},fast?{reasoning_effort:'none'}:{},json?{response_format:{type:'json_object'}}:{}))}).then(r=>r.json().catch(()=>({})).then(j=>{if(!r.ok){const m=(j.error&&j.error.message)||'';if(fast&&r.status===400&&/reasoning/i.test(m))return go(i,false);if(i<GROQ_MODELS.length-1&&/404|model/i.test(r.status+' '+m))return go(i+1,fast);throw new Error(r.status+' '+m)}return String(j.choices[0].message.content||'').replace(/<think>[\s\S]*?<\/think>/g,'').trim()}));
  return go(0,true).catch(e=>{throw aiErr(e)})}
