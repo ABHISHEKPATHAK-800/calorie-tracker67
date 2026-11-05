@@ -256,6 +256,7 @@ body:has(#v3.on) #stf,body:has(#vs.on) #stf{display:none}
 .dg:active{cursor:grabbing}.dg:focus-visible{outline:3px solid var(--ink);outline-offset:1px}
 #mm li.dragging{background:var(--tint,var(--bg));border-radius:16px;box-shadow:0 10px 24px -10px rgba(0,0,0,.45);position:relative;z-index:2}
 .act{margin-top:10px;border:1.5px dashed var(--ln);border-radius:14px;padding:10px 12px;background:var(--sf);font-size:.92rem}.act ul{margin:6px 0 10px;padding-left:18px}.act li{margin:2px 0}.act .row{display:flex;gap:8px;flex-wrap:wrap}.wt{display:block;margin-top:6px;color:var(--mu);font-size:.78rem}
+.ttsb{margin-left:8px;border:1.5px solid var(--ln);background:var(--bg);color:var(--ink);border-radius:99px;padding:4px 10px;cursor:pointer;font-size:.95rem}.ttsb.on{background:var(--ink);color:var(--bg)}
 </style>
 </head>
 <body>
@@ -468,6 +469,11 @@ body:has(#v3.on) #stf,body:has(#vs.on) #stf{display:none}
  <div class="kr"><input id="smk" type="password" autocomplete="off" spellcheck="false" placeholder="gsk_..." aria-label="Groq API key"><button class="ib" id="smv" type="button" aria-label="Show or hide key"><svg class="ic"><use href="#i-eye"/></svg></button></div>
  <label id="sml" style="display:none;margin-top:12px;font-weight:600"><input type="checkbox" id="sma"> Save for everyone (admin)</label>
  <p class="ks" id="sms" aria-live="polite"></p>
+ <div style="border-top:1.5px solid var(--ln);margin-top:16px;padding-top:12px"><b>Read aloud</b>
+  <div class="row"><label class="f"><span class="lh">Voice</span><select id="tsv"><option value="hannah">Hannah (natural)</option><option value="autumn">Autumn (natural)</option><option value="diana">Diana (natural)</option><option value="austin">Austin (natural)</option><option value="daniel">Daniel (natural)</option><option value="troy">Troy (natural)</option><option value="device">Device voice (free)</option></select></label></div>
+  <label class="f" style="flex-direction:row;gap:8px;align-items:center;margin-top:8px"><input type="checkbox" id="tsa"> <span>Read coach answers aloud automatically</span></label>
+  <div class="acts" style="margin-top:10px"><button type="button" class="btn alt sm tts" id="tst">Preview voice</button></div>
+  <p class="hint" style="margin:6px 0 0">Natural voices use your Groq key and cost a small amount per character. If they are unavailable the app uses your device voice.</p></div>
  <div class="acts"><button class="btn" id="smsv" type="button">Save key</button><button class="btn alt" id="smrm" type="button">Remove</button><button class="btn alt" id="smc" type="button">Close</button></div>
 </div></div>
 <div id="remw" aria-live="assertive"></div>
@@ -891,7 +897,7 @@ const WEBN=' Before answering any question about a food, drink, supplement or me
 let webUsed=0;
 const askW=async h=>{const sy=SYS+WEBN+'\n\nDATA:\n'+ctx(true);for(const m of await webModels()){try{const r=await webG(sy,h,m);webUsed=1;return r}catch(e){if(/invalid api key|401/i.test(String(e&&e.message||e)))break}}webUsed=0;return askG(h)};
 async function ask(q){q=q.trim();if(!q)return;bub('me',q);$('#cq').value='';const w=bub('ai','Thinking…');$('#cs').disabled=true;
- try{const stp=['Thinking…','Searching the web…','Reading what I found…','Writing your answer…'],t0=Date.now(),iv=setInterval(()=>{w.innerHTML=md(stp[Math.min(3,Math.floor((Date.now()-t0)/1500))])},400),[a00]=await Promise.all([askW(chatH.slice(-6).map(h=>h.r+': '+h.t).join('\n')+'\nUser: '+q),new Promise(r=>setTimeout(r,5500))]).finally(()=>clearInterval(iv)),am=a00.match(/\[\[ACTIONS:([\s\S]*)\]\]/i),a0=a00.replace(/\[\[ACTIONS:[\s\S]*\]\]/i,'').trim(),qm=a0.match(/\[\[ASK_QTY:?\s*([^\]]*)\]\]/i),item=qm?(qm[1].trim()||'this'):'',a=a0.replace(/\[\[ASK_QTY[^\]]*\]\]/ig,'').trim()||('How much '+item+' do you take?');chatH.push({r:'User',t:q},{r:'Coach',t:a});w.innerHTML=md(a);w.insertAdjacentHTML('beforeend','<small class="wt">'+(webUsed?'Checked with live web search':'Web search was unavailable, so this was answered without it')+'</small>');if(am)actCard(w,am[1]);if(qm)qtyForm(w,item)}catch(e){w.textContent=msg(e)}$('#cs').disabled=false;$('#chat').scrollTop=1e9}
+ try{const stp=['Thinking…','Searching the web…','Reading what I found…','Writing your answer…'],t0=Date.now(),iv=setInterval(()=>{w.innerHTML=md(stp[Math.min(3,Math.floor((Date.now()-t0)/1500))])},400),[a00]=await Promise.all([askW(chatH.slice(-6).map(h=>h.r+': '+h.t).join('\n')+'\nUser: '+q),new Promise(r=>setTimeout(r,5500))]).finally(()=>clearInterval(iv)),am=a00.match(/\[\[ACTIONS:([\s\S]*)\]\]/i),a0=a00.replace(/\[\[ACTIONS:[\s\S]*\]\]/i,'').trim(),qm=a0.match(/\[\[ASK_QTY:?\s*([^\]]*)\]\]/i),item=qm?(qm[1].trim()||'this'):'',a=a0.replace(/\[\[ASK_QTY[^\]]*\]\]/ig,'').trim()||('How much '+item+' do you take?');chatH.push({r:'User',t:q},{r:'Coach',t:a});w.innerHTML=md(a);w.insertAdjacentHTML('beforeend','<small class="wt">'+(webUsed?'Checked with live web search':'Web search was unavailable, so this was answered without it')+'</small>');if(am)actCard(w,am[1]);if(qm)qtyForm(w,item);{const tb=document.createElement('button');tb.type='button';tb.className='ttsb tts';tb.textContent='🔊';tb.setAttribute('aria-label','Read this answer aloud');tb.onclick=()=>ttsSpeak(a,tb);w.appendChild(tb);if(LS.get('ct.ttsauto',0))ttsSpeak(a,tb)}}catch(e){w.textContent=msg(e)}$('#cs').disabled=false;$('#chat').scrollTop=1e9}
 /* AI edits: proposed by the coach, applied only after the user taps Apply */
 const HM=/^([01]\d|2[0-3]):[0-5]\d$/,DT=/^\d{4}-\d{2}-\d{2}$/,sstr=(v,n)=>String(v==null?'':v).trim().slice(0,n||120);
 function actDesc(a){const n=sstr(a.name,60),ex=Object.keys(a).filter(k=>k!=='do'&&k!=='name').map(k=>k+' → '+(Array.isArray(a[k])?a[k].join(', '):a[k])).join('; ');
@@ -916,6 +922,25 @@ function actCard(w,raw){let L;try{L=JSON.parse(raw.trim());if(!Array.isArray(L))
   const chg={prof:0,days:new Set()};let ok=0,bad=[];L.forEach(a=>{try{applyAct(a,chg);ok++}catch(_){bad.push(actDesc(a))}});
   if(chg.prof)saveP();chg.days.forEach(k=>DB.put(k));rAll();c._snap=snap;
   c.innerHTML='<b>'+(ok?'Applied '+ok+' change'+(ok>1?'s':''):'Nothing was applied')+'.</b>'+(bad.length?'<p class="hint" style="margin:6px 0 0">Could not apply: '+bad.map(esc).join('; ')+'</p>':'')+(ok?'<div class="row" style="margin-top:8px"><button type="button" class="btn sm alt" data-u="1">Undo</button></div>':'')}}
+/* Text to speech: natural Groq (Orpheus) voices, device voice as backup */
+let ttsId=0,ttsAu=null;
+const ttsVoice=()=>LS.get('ct.tts','hannah')||'hannah';
+function ttsClean(t){return String(t).replace(/\[\[[\s\S]*?\]\]/g,' ').replace(/\[([^\]]*)\]\([^)]*\)/g,'$1').replace(/https?:\/\/\S+/g,'').replace(/\[[^\]]*\]/g,'').replace(/[*_#`>|~]/g,'').replace(/\s*\n+\s*/g,'. ').replace(/\s{2,}/g,' ').trim()}
+function ttsChunks(t,n){const out=[];let c='';for(const x of t.match(/[^.!?]+[.!?]*\s*/g)||[t]){if(x.length>n){if(c.trim())out.push(c.trim());c='';for(let i=0;i<x.length;i+=n)out.push(x.slice(i,i+n).trim());continue}if((c+x).length>n){out.push(c.trim());c=''}c+=x}if(c.trim())out.push(c.trim());return out}
+async function ttsGroq(txt){const r=await fetch('https://api.groq.com/openai/v1/audio/speech',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+GROQ_KEY},body:JSON.stringify({model:'canopylabs/orpheus-v1-english',voice:ttsVoice(),input:txt,response_format:'wav'})});
+ if(!r.ok){let m=r.status;try{m=(await r.json()).error.message}catch(_){}throw new Error(m)}return URL.createObjectURL(await r.blob())}
+function ttsReset(){document.querySelectorAll('.tts.on').forEach(b=>{b.classList.remove('on');b.textContent=b.dataset.lb||'🔊'})}
+function ttsStop(){ttsId++;if(ttsAu){try{ttsAu.pause()}catch(_){}ttsAu=null}try{speechSynthesis.cancel()}catch(_){}ttsReset()}
+async function ttsSpeak(text,btn){const was=btn.classList.contains('on');ttsStop();if(was)return;const t=ttsClean(text);if(!t)return;const id=++ttsId;btn.dataset.lb=btn.dataset.lb||btn.textContent;btn.classList.add('on');btn.textContent='⏹ Stop';
+ const done=()=>{if(id===ttsId){btn.classList.remove('on');btn.textContent=btn.dataset.lb}};
+ const latin=(t.match(/[A-Za-z0-9\s.,!?'’%()\-:;]/g)||[]).length/t.length>.8;
+ if(ttsVoice()!=='device'&&GROQ_KEY&&latin){try{const ch=ttsChunks(t,190);let nx=ttsGroq(ch[0]);for(let i=0;i<ch.length;i++){const u=await nx;if(id!==ttsId)return;nx=i+1<ch.length?ttsGroq(ch[i+1]):null;if(nx)nx.catch(()=>{});await new Promise((ok,no)=>{const a=new Audio(u);ttsAu=a;a.onended=ok;a.onerror=()=>no(new Error('audio error'));a.play().catch(no)});URL.revokeObjectURL(u)}done();return}catch(e){if(id!==ttsId)return;toast('Natural voice unavailable ('+String(e&&e.message||e).slice(0,80)+'). Using your device voice.')}}
+ if(!('speechSynthesis' in window)){toast('Speech is not supported in this browser');done();return}
+ const vs=speechSynthesis.getVoices(),dev=/[\u0900-\u097F]/.test(t)?'hi':'en',vo=vs.find(v=>/natural|neural|premium|enhanced|google/i.test(v.name)&&v.lang.toLowerCase().startsWith(dev))||vs.find(v=>v.lang.toLowerCase().startsWith(dev));
+ ttsChunks(t,200).forEach((c,i,a)=>{const u=new SpeechSynthesisUtterance(c);if(vo)u.voice=vo;u.lang=vo?vo.lang:(dev==='hi'?'hi-IN':'en-US');if(i===a.length-1)u.onend=u.onerror=done;speechSynthesis.speak(u)})}
+$('#tsv').value=ttsVoice();$('#tsa').checked=!!LS.get('ct.ttsauto',0);
+$('#tsv').onchange=()=>LS.set('ct.tts',$('#tsv').value);$('#tsa').onchange=()=>LS.set('ct.ttsauto',$('#tsa').checked?1:0);
+$('#tst').onclick=()=>ttsSpeak('Hi! This is how I will sound when I read your answers.',$('#tst'));
 $('#cs').onclick=()=>ask($('#cq').value);$('#cq').onkeydown=e=>{if(e.key==='Enter')ask($('#cq').value)};$('#chips').onclick=e=>{const b=e.target.closest('button');if(b)ask(b.textContent)};
 
 if(PH)phone();else local.restore().then(function(u){return u||(FB_READY&&LS.get('ct.cloud',null)?cloud.restore():null)}).then(function(u){if(u)enter(u)}).catch(function(){});
